@@ -1,0 +1,33 @@
+@base <http://data-webapp.hugonlabs.com/test1/> .
+@prefix sdtw: <http://ontology.hugonlabs.com/sdtw/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+@prefix ssn: <http://www.w3.org/ns/ssn/> .
+@prefix qudt: <http://qudt.org/2.1/schema/qudt/> .
+@prefix unit: <http://qudt.org/2.1/vocab/unit/> .
+@prefix quantityKind: <http://qudt.org/2.1/vocab/quantitykind/> .
+
+<users/jhugon>
+    a sosa:Sensor ;
+    a foaf:Person ;
+    foaf:name "Justin Hugon" .
+
+<features/car1>
+    a sosa:FeatureOfInterest ;
+    rdfs:label "Car1" ;
+    rdfs:comment "Example car" .
+
+<properties/car1/odometer>
+    a sdtw:Property ;
+    rdfs:label "Car1's odometer" ;
+    rdfs:comment "Car1's odometer reading" ;
+    sdtw:hasQuantityKind  quantityKind:Length ;
+    sdtw:hasUnit unit:MI .
+
+<properties/car1/gasfillup>
+    a sdtw:Property ;
+    rdfs:label "Car1 fill up with gas" ;
+    rdfs:comment "The amount of gas pumped into Car1's gas tank" ;
+    sdtw:hasQuantityKind  quantityKind:LiquidVolume ;
+    sdtw:hasUnit unit:GAL_US .

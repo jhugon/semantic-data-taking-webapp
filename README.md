@@ -14,7 +14,7 @@ Custom classes are prefixed with `sdtw`.
   - In this case the data-entering user, `sdtw:User`, would be of type `sosa:Sensor` and also either a `foaf:Person` or `vcard:Individual`
   - The particular car would be of type `sosa:FeatureOfInterest`
   - The odometer reading would be a `sdtw:Property`, a subclass of `sosa:ObservableProperty`
-    - Each record of the odometer reading would be a `sosa:Observation` with the the value `sosa:hasResult` and recording time `sosa:resultTime` (a `xsd:dateTime`)
+    - Each record of the odometer reading would be a `sosa:Observation` with the value `sosa:hasResult` and recording time `sosa:resultTime` (a `xsd:dateTime`)
       - I'd like to include units, so the `sosa:Result` could also be of type `qudt:Quantity` from [QUDT](https://www.qudt.org/) and be given a `qudt:unit` and the actual value would be stored as a `qudt:value`
     - The `sdtw:Property` should also `sdtw:hasQuantityKind` and possibly `sdtw:hasUnit` the `sosa:Observable` should be given in
   - The amount of fuel put in the car would be another `sosa:ObservableProperty`
