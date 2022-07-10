@@ -42,27 +42,18 @@ Ontology(<http://ontology.hugonlabs.com/sdtw/>
 
   ##########################################
   
-  Declaration(Class(sdtw:User))
-  Declaration(Class(sdtw:Property))
   Declaration(ObjectProperty(sdtw:hasTime))
   Declaration(ObjectProperty(sdtw:hasQualityKind))
   Declaration(ObjectProperty(sdtw:hasUnit))
   
   ##########################################
   
-  SubClassOf(:User sosa:Sensor)
-  SubClassOf(:User foaf:Person)
-  
-  SubClassOf(:Property sosa:ObservableProperty)
-  
-  ##########################################
-  
   ObjectPropertyDomain(:hasTime ssn:Stimulus ) 
   ObjectPropertyRange( :hasTime xsd:dateTime ) 
   
-  ObjectPropertyDomain(:hasQualityKind :Property ) 
+  ObjectPropertyDomain(:hasQualityKind sosa:ObservableProperty )
   ObjectPropertyRange( :hasQualityKind qudt:QuantityKind ) 
   
-  ObjectPropertyDomain(:hasUnit :Property ) 
+  ObjectPropertyDomain(:hasUnit sosa:ObservableProperty )
   ObjectPropertyRange( :hasUnit qudt:Unit ) 
 )

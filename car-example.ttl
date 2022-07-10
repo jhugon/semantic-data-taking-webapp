@@ -19,15 +19,15 @@
     rdfs:comment "Example car" .
 
 <properties/car1/odometer>
-    a sdtw:Property ;
+    a sosa:ObservableProperty ;
     rdfs:label "Car1's odometer" ;
     rdfs:comment "Car1's odometer reading" ;
-    sdtw:hasQuantityKind  quantityKind:Length ;
+    sdtw:hasQuantityKind quantityKind:Length ;
     sdtw:hasUnit unit:MI .
 
 <properties/car1/gasfillup>
-    a sdtw:Property ;
+    a sosa:ObservableProperty ;
     rdfs:label "Car1 fill up with gas" ;
     rdfs:comment "The amount of gas pumped into Car1's gas tank" ;
-    sdtw:hasQuantityKind  quantityKind:LiquidVolume ;
+    sdtw:hasQuantityKind quantityKind:LiquidVolume ;
     sdtw:hasUnit unit:GAL_US .
