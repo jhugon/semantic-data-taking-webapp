@@ -1,17 +1,20 @@
 @base <http://data-webapp.hugonlabs.com/test1/> .
-@prefix sdtw: <http://ontology.hugonlabs.com/sdtw/> .
+@prefix sdtw: <http://ontology.hugonlabs.com/sdtw#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix sosa: <http://www.w3.org/ns/sosa/> .
 @prefix ssn: <http://www.w3.org/ns/ssn/> .
-@prefix qudt: <http://qudt.org/2.1/schema/qudt/> .
-@prefix unit: <http://qudt.org/2.1/vocab/unit/> .
-@prefix quantityKind: <http://qudt.org/2.1/vocab/quantitykind/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantityKind: <http://qudt.org/vocab/quantitykind/> .
 
 <users/jhugon>
     a sosa:Sensor ;
     a foaf:Person ;
     foaf:name "Justin Hugon" ;
+    ssn:detects <stimuli/car1/2022-07-10T00:00:00Z> ;
     .
 
 <features/car1>
@@ -24,6 +27,7 @@
     a sosa:ObservableProperty ;
     rdfs:label "Car1's odometer" ;
     rdfs:comment "Car1's odometer reading" ;
+    ssn:isPropertyOf <features/car1>;
     sdtw:hasQuantityKind quantityKind:Length ;
     sdtw:hasUnit unit:MI ;
     .
@@ -32,6 +36,7 @@
     a sosa:ObservableProperty ;
     rdfs:label "Car1 gas quantity" ;
     rdfs:comment "The amount of gasoline pumped into Car1's gas tank" ;
+    ssn:isPropertyOf <features/car1>;
     sdtw:hasQuantityKind quantityKind:LiquidVolume ;
     sdtw:hasUnit unit:GAL_US ;
     .
@@ -41,6 +46,7 @@
     rdfs:label "Car1 stimulus at 2022-07-10T00:00:00Z" ;
     rdfs:comment "Decided to stop for gas" ;
     sdtw:hasTime "2022-07-10T00:00:00Z"^^xsd:dateTime ;
+    ssn:isProxyFor <properties/car1/odometer> , <stimuli/car1/2022-07-10T00:00:00Z> ;
     .
 
 <observations/car1/odometer/2022-07-10T00:00:00Z>

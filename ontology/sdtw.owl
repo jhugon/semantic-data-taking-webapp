@@ -1,11 +1,9 @@
-Prefix(:=<http://ontology.hugonlabs.com/sdtw/>)
-Prefix(sdtw:=<http://ontology.hugonlabs.com/sdtw/>)
+Prefix(:=<http://ontology.hugonlabs.com/sdtw#>)
+Prefix(sdtw:=<http://ontology.hugonlabs.com/sdtw#>)
 Prefix(rdf:=<http://www.w3.org/1999/02/22-rdf-syntax-ns#>)
 Prefix(rdfs:=<http://www.w3.org/2000/01/rdf-schema#>)
 Prefix(xsd:=<http://www.w3.org/2001/XMLSchema#>)
 Prefix(owl:=<http://www.w3.org/2002/07/owl#>)
-Prefix(vann:=<http://purl.org/vocab/vann/>)
-Prefix(foaf:=<http://xmlns.com/foaf/0.1/>)
 Prefix(time:=<http://www.w3.org/2006/time#>)
 Prefix(sosa:=<http://www.w3.org/ns/sosa/>)
 Prefix(ssn:=<http://www.w3.org/ns/ssn/>)
@@ -14,7 +12,7 @@ Prefix(dcterms:=<http://purl.org/dc/terms/>)
 
 ##########################################
 
-Ontology(<http://ontology.hugonlabs.com/sdtw/>
+Ontology(<http://ontology.hugonlabs.com/sdtw#>
   Import(<http://www.w3.org/ns/ssn/>)
   Import(<http://www.w3.org/ns/sosa/>)
   Import(<http://qudt.org/2.1/schema/qudt>)
@@ -24,8 +22,6 @@ Ontology(<http://ontology.hugonlabs.com/sdtw/>
   Annotation(dcterms:license <https://www.gnu.org/licenses/gpl-3.0.en.html>)
   Annotation(dcterms:rights "Copyright 2021 Justin Hugon.")
   Annotation(dcterms:title "Semantic Data Taking Web-app Ontology"@en)
-  Annotation(vann:preferredNamespacePrefix "sdtw")
-  Annotation(vann:preferredNamespaceUri "http://ontology.hugonlabs.com/sdtw/")
   Annotation(rdfs:seeAlso <https://github.com/jhugon/semantic-data-taking-webapp>)
   
   
@@ -37,8 +33,6 @@ Ontology(<http://ontology.hugonlabs.com/sdtw/>
   Declaration(AnnotationProperty(dcterms:license))
   Declaration(AnnotationProperty(dcterms:rights))
   Declaration(AnnotationProperty(dcterms:title))
-  Declaration(AnnotationProperty(vann:preferredNamespacePrefix))
-  Declaration(AnnotationProperty(vann:preferredNamespaceUri))
 
   ##########################################
   
