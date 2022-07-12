@@ -31,17 +31,17 @@ class DBInterface:
     def getPrettyTitle(self,observedProperty):
         label = db.getLabel(observedProperty)
         unit = self.graph.value(observedProperty,SDTW.hasUnit)
-        print(unit)
-        for p in self.graph.predicates(unit):
-            print("        ",p)
         unit_label = self.graph.value(unit,QUDT.symbol)
         result = f"{label} [{unit_label}]"
         return result
+
+    def getColumnHeadings(self,featureOfInterest):
+        props = list(self.listObservableProperties(featureOfInterest))
+        headings = [self.getPrettyTitle(x) for x in props]
+        return props, headings
 
 if __name__ == "__main__":
     db = DBInterface("car-example.ttl")
     for feature in db.listFeatures():
         print(db.getLabel(feature))
-        for prop in db.listObservableProperties(feature):
-            print(db.getPrettyTitle(prop))
-    db.graph.serialize(destination="silly.ttl")
+        print(db.getColumnHeadings(feature))
