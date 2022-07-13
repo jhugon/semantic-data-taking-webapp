@@ -46,7 +46,7 @@
     rdfs:label "Car1 stimulus at 2022-07-10T00:00:00Z" ;
     rdfs:comment "Decided to stop for gas" ;
     sdtw:hasTime "2022-07-10T00:00:00Z"^^xsd:dateTime ;
-    ssn:isProxyFor <properties/car1/odometer> , <stimuli/car1/2022-07-10T00:00:00Z> ;
+    ssn:isProxyFor <properties/car1/odometer> , <properties/car1/gasqty> ;
     .
 
 <observations/car1/odometer/2022-07-10T00:00:00Z>
@@ -77,4 +77,27 @@
         rdf:type qudt:Quantity ;
         qudt:unit unit:GAL_US ;
         qudt:value "11.2"^^xsd:float ] ;
+    .
+
+<stimuli/car1/2022-07-11T00:00:00Z>
+    a ssn:Stimulus ;
+    rdfs:label "Car1 stimulus at 2022-07-11T00:00:00Z" ;
+    rdfs:comment "Decided to stop for gas" ;
+    sdtw:hasTime "2022-07-11T00:00:00Z"^^xsd:dateTime ;
+    ssn:isProxyFor <properties/car1/odometer> ;
+    .
+
+<observations/car1/odometer/2022-07-11T00:00:00Z>
+    a sosa:Observation ;
+    rdfs:label "Car1 odometer obs at 2022-07-11T00:00:00Z" ;
+    sosa:madeBySensor <users/jhugon> ;
+    ssn:wasOriginatedBy <stimuli/car1/2022-07-11T00:00:00Z> ;
+    sosa:hasFeatureOfInterest <features/car1> ;
+    sosa:observedProperty <properties/car1/odometer> ;
+    sosa:resultTime "2022-07-11T00:00:00Z"^^xsd:dateTime ;
+    sosa:hasResult [
+        rdf:type sosa:Result ;
+        rdf:type qudt:Quantity ;
+        qudt:unit unit:MI ;
+        qudt:value "12500"^^xsd:float ] ;
     .
