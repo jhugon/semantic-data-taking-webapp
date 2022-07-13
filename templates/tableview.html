@@ -1,0 +1,25 @@
+<!doctype html>
+<head>
+  <title>
+    Data Taking App: Data Table View of {{ featureName }} Feature
+  </title>
+</head>
+<body>
+  <h1>
+    Data Taking App: Data Table View of {{ featureName }} Feature
+  </h1>
+  <nav>
+    <a href="/">Top<a>
+  </nav>
+  <main>
+    <table>
+      <tr>
+        {% for heading in headings %}
+          <th>
+            {{ heading }}
+          </th>
+        {% endfor %}
+      </tr>
+    </table>
+  </main>
+</body>

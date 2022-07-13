@@ -22,7 +22,7 @@ class DBInterface:
     def getListLabels(self,l):
         return [self.graph.value(x,RDFS.label).value for x in l]
 
-    def listFeatures(self,):
+    def listFeatures(self):
         return self.graph.subjects(RDF.type, SOSA.FeatureOfInterest)
 
     def listObservableProperties(self,featureOfInterest):

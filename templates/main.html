@@ -1,0 +1,21 @@
+<!doctype html>
+<head>
+  <title>
+    Data Taking App
+  </title>
+</head>
+<body>
+  <h1>
+    Data taking App
+  </h1>
+  <main>
+    <h2>
+      Features:
+    </h2>
+  {% for featureName in db.getListLabels(db.listFeatures()) %}
+    <p>
+        <a href="features/{{ featureName }}">{{ featureName }}</a>
+    </p>
+  {% endfor %}
+  </main>
+</body>
