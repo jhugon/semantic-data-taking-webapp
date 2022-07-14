@@ -3,23 +3,47 @@
   <title>
     Data Taking App: Data Table View of {{ featureName }} Feature
   </title>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+    td, th {
+      border: 1px solid #dddddd;
+      padding: 8px;
+    }
+  </style>
 </head>
 <body>
   <h1>
     Data Taking App: Data Table View of {{ featureName }} Feature
   </h1>
   <nav>
-    <a href="/">Top<a>
+    <a href="/">Top</a>
   </nav>
   <main>
     <table>
       <tr>
+        <th>
+            Timestamp
+        </th>
         {% for heading in headings %}
           <th>
             {{ heading }}
           </th>
         {% endfor %}
       </tr>
+      {% for stim_time, data_row in zip(stim_times,data) %}
+        <tr>
+          <td>
+            {{ stim_time }}
+          </td>
+            {% for data_cell in data_row %}
+              <td>
+                {{ data_cell }}
+              </td>
+            {% endfor %}
+        </tr>
+      {% endfor %}
     </table>
   </main>
 </body>

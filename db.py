@@ -1,4 +1,4 @@
-from rdflib import Graph, Namespace
+from rdflib import Graph, Namespace, URIRef
 from rdflib.namespace import RDF, RDFS, SSN, SOSA
 
 SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
@@ -16,32 +16,47 @@ class DBInterface:
         self.graph.parse("cache/quantitykind")
         self.graph.parse("cache/unit")
 
+    def convertToURIRef(self,x):
+        """
+        A URI, in string form, doesn't match with anything in rdflib
+        This method converts URI strings to rdflib.URIRef, which does match
+        """
+        if isinstance(x,URIRef):
+            return x
+        else:
+            return URIRef(x)
+
     def getLabel(self,x):
+        x = self.convertToURIRef(x)
         return self.graph.value(x,RDFS.label).value
 
     def getListLabels(self,l):
-        return [self.graph.value(x,RDFS.label).value for x in l]
+        return [self.getLabel(x) for x in l]
 
     def listFeatures(self):
         return self.graph.subjects(RDF.type, SOSA.FeatureOfInterest)
 
     def listObservableProperties(self,featureOfInterest):
+        featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = sorted(self.graph.subjects(SSN.isPropertyOf,featureOfInterest),key=lambda x: self.graph.value(x,RDFS.label).value)
         return props
 
     def getPrettyTitle(self,observedProperty):
-        label = db.getLabel(observedProperty)
+        observedProperty = self.convertToURIRef(observedProperty)
+        label = self.getLabel(observedProperty)
         unit = self.graph.value(observedProperty,SDTW.hasUnit)
         unit_label = self.graph.value(unit,QUDT.symbol)
         result = f"{label} [{unit_label}]"
         return result
 
     def getColumnHeadings(self,featureOfInterest):
+        featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))
         headings = [self.getPrettyTitle(x) for x in props]
         return props, headings
 
     def getData(self,featureOfInterest):
+        featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))
         stimuli = set()
         for prop in props:

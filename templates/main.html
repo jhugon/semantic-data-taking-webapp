@@ -12,9 +12,11 @@
     <h2>
       Features:
     </h2>
-  {% for featureName in db.getListLabels(db.listFeatures()) %}
+  {% for feature in db.listFeatures() %}
+    {% set featureName = db.getLabel(feature) %}
+    {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
     <p>
-        <a href="features/{{ featureName }}">{{ featureName }}</a>
+        <a href="features?feature={{ featureURLEncoded }}">{{ featureName }}</a>
     </p>
   {% endfor %}
   </main>
