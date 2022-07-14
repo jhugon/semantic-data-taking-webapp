@@ -1,9 +1,20 @@
-from rdflib import Graph, Namespace, URIRef
+from rdflib import Graph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, RDFS, SSN, SOSA
+import os.path
 
 SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
+data_prefix = "http://data-webapp.hugonlabs.com/test1/"
+
+class DBInterfaceError(Exception):
+    pass
+
+class FeatureAlreadyExistsError(DBInterfaceError):
+    pass
+
+class ObservablePropertyExistsError(DBInterfaceError):
+    pass
 
 class DBInterface:
     def __init__(self,graph_uri):
@@ -30,16 +41,47 @@ class DBInterface:
         x = self.convertToURIRef(x)
         return self.graph.value(x,RDFS.label).value
 
+    def getComment(self,x):
+        x = self.convertToURIRef(x)
+        return self.graph.value(x,RDFS.comment).value
+
     def getListLabels(self,l):
         return [self.getLabel(x) for x in l]
 
     def listFeatures(self):
         return self.graph.subjects(RDF.type, SOSA.FeatureOfInterest)
 
+    def addNewFeature(self,label,comment):
+        featureURI = os.path.join(data_prefix,"features",label.lower())
+        feature = URIRef(featureURI)
+        if (feature,None,None) in self.graph:
+            raise FeatureAlreadyExistsError(f"Feature with label '{label}' is already in graph")
+        self.graph.add((feature,RDF.type,SOSA.FeatureOfInterest))
+        self.graph.set((feature,RDFS.label,Literal(label)))
+        self.graph.set((feature,RDFS.comment,Literal(comment)))
+
     def listObservableProperties(self,featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = sorted(self.graph.subjects(SSN.isPropertyOf,featureOfInterest),key=lambda x: self.graph.value(x,RDFS.label).value)
         return props
+
+    def addNewObservableProperty(self,label,comment,feature,quantityKind,unit):
+        feature = self.convertToURIRef(feature)
+        featureName = self.getLabel(feature)
+        propURI = os.path.join(data_prefix,"properties",featureName.lower(),label.lower())
+        prop = URIRef(propURI)
+        if (prop,None,None) in self.graph:
+            raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
+        quantityKind = self.convertToURIRef(quantityKind)
+        unit = self.convertToURIRef(unit)
+        label = Literal(label)
+        comment = Literal(comment)
+        self.graph.add((prop,RDF.type,SOSA.ObservableProperty))
+        self.graph.set((prop,RDFS.label,label))
+        self.graph.set((prop,RDFS.comment,comment))
+        self.graph.set((prop,SSN.isPropertyOf,feature))
+        self.graph.set((prop,SDTW.hasQuantityKind,quantityKind))
+        self.graph.set((prop,SDTW.hasUnit,unit))
 
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
@@ -81,10 +123,19 @@ class DBInterface:
             data.append(stim_data)
         return stim_times, data
 
+    def enterData(self,feature,t,sensor,comment,datadict):
+        featureName = self.getLabel(feature)
+        stimulusURI = os.path.join(data_prefix,"stimuli",featureName.lower(),t.upper())
+        stimulus = self.convertToURIRef(stimulusURI)
+
 
 if __name__ == "__main__":
     db = DBInterface("car-example.ttl")
+    db.addNewFeature("joke1","nock, nock: who's there?")
+    #db.addNewFeature("car1","bad car")
+    db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
+    #db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
     for feature in db.listFeatures():
-        print(db.getLabel(feature))
+        print(feature,db.getLabel(feature),db.getComment(feature))
         print(db.getColumnHeadings(feature))
-        print(db.getData(feature))
+        #print(db.getData(feature))
