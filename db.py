@@ -1,6 +1,7 @@
 from rdflib import Graph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 import os.path
+import re
 
 SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
@@ -148,6 +149,9 @@ class DBInterface:
                 datum = datadict[str(prop)]
             except KeyError:
                 continue
+            if re.match(r"^\s*$",datum):
+                continue
+            datum = float(datum)
             unit = self.graph.value(prop,SDTW.hasUnit)
             propName = self.getLabel(prop)
             observationURI = os.path.join(data_prefix,"observations",featureName,propName,t)

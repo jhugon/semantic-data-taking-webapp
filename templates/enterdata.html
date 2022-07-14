@@ -1,0 +1,33 @@
+<!doctype html>
+<head>
+  <title>
+    Data Taking App: Enter Data into {{ featureName }} Feature
+  </title>
+</head>
+<body>
+  <h1>
+    Data Taking App: Enter Data into {{ featureName }} Feature
+  </h1>
+  <nav>
+    <a href="/">Top</a>
+  </nav>
+  <main>
+    <form action="form/adddata" method="post">
+      {% for propheading in propheadings %}
+      {% set prop=propheading[0] %}
+      {% set heading=propheading[1] %}
+        <p>
+          <input type="text" id="{{ prop }}" name="{{ prop }}">
+          <label for="{{ prop }}">{{ heading }}<label>
+        </p>
+      {% endfor %}
+      <input type="text" name="feature" value="{{feature}}" readonly hidden>
+      <input type="submit" value="Submit">
+    </form>
+    {% if status == "success" %}
+    <p>
+      Successful Submission
+    </p>
+    {% endif %}
+  </main>
+</body>
