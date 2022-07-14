@@ -1,5 +1,5 @@
-from rdflib import Graph, Namespace, URIRef, Literal
-from rdflib.namespace import RDF, RDFS, SSN, SOSA
+from rdflib import Graph, Namespace, URIRef, BNode, Literal
+from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 import os.path
 
 SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
@@ -124,9 +124,48 @@ class DBInterface:
         return stim_times, data
 
     def enterData(self,feature,t,sensor,comment,datadict):
+        """
+        feature should be a featureOfInterest URI
+        t should be a datetime ISO string
+        sensor should be a sensor URI
+        comment should be a comment string
+        datadict should be a dict with keys the observableproperties of the feature and values the result values
+        """
+        assert(type(t) == str)
+        feature = self.convertToURIRef(feature)
+        sensor = self.convertToURIRef(sensor)
         featureName = self.getLabel(feature)
+        props = list(self.listObservableProperties(feature))
         stimulusURI = os.path.join(data_prefix,"stimuli",featureName.lower(),t.upper())
         stimulus = self.convertToURIRef(stimulusURI)
+        self.graph.add((stimulus,RDF.type,SSN.Stimulus))
+        self.graph.set((stimulus,RDFS.comment,Literal(comment)))
+        self.graph.set((stimulus,SDTW.hasTime,Literal(t,datatype=XSD.dateTime)))
+        for prop in props:
+            prop = self.convertToURIRef(prop)
+            datum = None
+            try:
+                datum = datadict[str(prop)]
+            except KeyError:
+                continue
+            unit = self.graph.value(prop,SDTW.hasUnit)
+            propName = self.getLabel(prop)
+            observationURI = os.path.join(data_prefix,"observations",featureName,propName,t)
+            observation = self.convertToURIRef(observationURI)
+            self.graph.add((stimulus,SSN.isProxyFor,prop))
+            self.graph.add((observation,RDF.type,SOSA.Observation))
+            self.graph.set((observation,RDFS.comment,Literal(comment)))
+            self.graph.set((observation,SOSA.madeBySensor,sensor))
+            self.graph.set((observation,SSN.wasOriginatedBy,stimulus))
+            self.graph.set((observation,SOSA.hasFeatureOfInterest,feature))
+            self.graph.set((observation,SOSA.observedProperty,prop))
+            self.graph.set((observation,SOSA.resultTime,Literal(t,datatype=XSD.dateTime)))
+            res = BNode()
+            self.graph.set((observation,SOSA.hasResult,res))
+            self.graph.set((res,RDF.type,SOSA.Result))
+            self.graph.set((res,RDF.type,QUDT.Quantity))
+            self.graph.set((res,QUDT.value,Literal(datum)))
+            self.graph.set((res,QUDT.unit,unit))
 
 
 if __name__ == "__main__":
@@ -134,8 +173,13 @@ if __name__ == "__main__":
     db.addNewFeature("joke1","nock, nock: who's there?")
     #db.addNewFeature("car1","bad car")
     db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
+    db.addNewObservableProperty("L1","Length of R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/Length","http://qudt.org/vocab/unit/M")
     #db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.2,'http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':0.05})
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.1,'http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':0.06})
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.1})
     for feature in db.listFeatures():
         print(feature,db.getLabel(feature),db.getComment(feature))
         print(db.getColumnHeadings(feature))
-        #print(db.getData(feature))
+        print(db.getData(feature))
+        print()
