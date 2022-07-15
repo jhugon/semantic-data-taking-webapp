@@ -12,7 +12,19 @@ USER="http://data-webapp.hugonlabs.com/test1/users/jhugon"
 
 @app.route("/")
 def main():
-    return render_template("main.html",db=db,urllib=urllib)
+    status = None
+    try:
+        status = request.args["status"]
+    except KeyError:
+        pass
+    reason = None
+    try:
+        reason = request.args["reason"]
+    except KeyError:
+        pass
+    print(status)
+    print(reason)
+    return render_template("main.html",db=db,urllib=urllib,status=status,reason=reason)
 
 @app.route("/features")
 def features():
@@ -53,6 +65,16 @@ def enterdata():
     props, headings = db.getColumnHeadings(feature)
     propheadings = list(zip([str(prop) for prop in props],headings))
     return render_template("enterdata.html",featureName=featureName,feature=str(feature),propheadings=propheadings,status=status,reason=reason)
+
+@app.route("/form/addfeature",methods=["post"])
+def form_addfeature():
+    featurename = request.form["featurename"]
+    comment = request.form["comment"]
+    try:
+        db.addNewFeature(featurename,comment)
+    except Exception as e:
+        return redirect(url_for("main")+"?status=error&reason="+str(e))
+    return redirect(url_for("main")+"?status=success")
 
 @app.route("/form/adddata",methods=["post"])
 def form_adddata():

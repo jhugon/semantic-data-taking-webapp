@@ -12,12 +12,38 @@
     <h2>
       Features:
     </h2>
-  {% for feature in db.listFeatures() %}
-    {% set featureName = db.getLabel(feature) %}
-    {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
+    {% for feature in db.listFeatures() %}
+      {% set featureName = db.getLabel(feature) %}
+      {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
+      <p>
+          <a href="features?feature={{ featureURLEncoded }}">{{ featureName }}</a>
+      </p>
+    {% endfor %}
+    <h2>
+      Add New Feature:
+    </h2>
+    <form action="form/addfeature" method="post">
+      <p>
+        <label for="featurename">Feature name:<label>
+        <input type="text" name="featurename" id="featurename" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _">
+      </p>
+      <p>
+        <label for="comment">Description:<label>
+      </p>
+      <p>
+        <textarea name="comment" id="comment" rows="4" cols="45"></textarea>
+      </p>
+      <input type="submit" value="Submit">
+    </form>
+    {% if status == "success" %}
     <p>
-        <a href="features?feature={{ featureURLEncoded }}">{{ featureName }}</a>
+      Successful Submission
     </p>
-  {% endfor %}
+    {% endif %}
+    {% if status == "error" %}
+    <p>
+      Error: {{ reason }}
+    </p>
+    {% endif %}
   </main>
 </body>

@@ -56,6 +56,8 @@ class DBInterface:
         return self.graph.subjects(RDF.type, SOSA.FeatureOfInterest)
 
     def addNewFeature(self,label,comment):
+        if not re.match(r"^\w+$",label):
+            raise DataValidationError("Feature label must be more than one letter, number, or _")
         featureURI = os.path.join(data_prefix,"features",label.lower())
         feature = URIRef(featureURI)
         if (feature,None,None) in self.graph:
