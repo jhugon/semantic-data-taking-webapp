@@ -16,7 +16,7 @@
       {% set featureName = db.getLabel(feature) %}
       {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
       <p>
-          <a href="features?feature={{ featureURLEncoded }}">{{ featureName }}</a>
+          <a href="feature?feature={{ featureURLEncoded }}">{{ featureName }}</a>
       </p>
     {% endfor %}
     <h2>

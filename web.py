@@ -26,12 +26,19 @@ def main():
     print(reason)
     return render_template("main.html",db=db,urllib=urllib,status=status,reason=reason)
 
-@app.route("/features")
+@app.route("/feature")
 def features():
     feature = request.args["feature"]
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
-    return render_template("features.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib)
+    return render_template("feature.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib)
+
+@app.route("/addproperty")
+def addproperty():
+    feature = request.args["feature"]
+    featureName = db.getLabel(feature)
+    featureURLEncoded = urllib.parse.quote(feature, safe="")
+    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib)
 
 @app.route("/tableview")
 def tableview():
@@ -68,6 +75,16 @@ def enterdata():
 
 @app.route("/form/addfeature",methods=["post"])
 def form_addfeature():
+    featurename = request.form["featurename"]
+    comment = request.form["comment"]
+    try:
+        db.addNewFeature(featurename,comment)
+    except Exception as e:
+        return redirect(url_for("main")+"?status=error&reason="+str(e))
+    return redirect(url_for("main")+"?status=success")
+
+@app.route("/form/addproperty",methods=["post"])
+def form_addproperty():
     featurename = request.form["featurename"]
     comment = request.form["comment"]
     try:

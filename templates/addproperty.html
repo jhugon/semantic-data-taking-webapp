@@ -1,0 +1,48 @@
+<!doctype html>
+<head>
+  <title>
+    Data Taking App: Add Property to {{ featureName }} Feature
+  </title>
+</head>
+<body>
+  <h1>
+    Data Taking App: Add Property to {{ featureName }} Feature
+  </h1>
+  <nav>
+    <a href="/">Top<a>
+  </nav>
+  <main>
+    <form action="form/addproperty" method="post">
+      <p>
+        <label for="propname">Property Name:<label>
+        <input type="text" id="propname" name="propname">
+      </p>
+      <p>
+        <label for="quantitykind">Kind of Quantity:<label>
+        <input type="text" id="quantitykind" name="quantitykind">
+      </p>
+      <p>
+        <label for="unit">Unit:<label>
+        <input type="text" id="unit" name="unit">
+      </p>
+      <p>
+        <label for="comment">Description:<label>
+      </p>
+      <p>
+        <textarea name="comment" id="comment" rows="4" cols="45"></textarea>
+      </p>
+      <input type="text" name="feature" value="{{feature}}" readonly hidden>
+      <input type="submit" value="Submit">
+    </form>
+    {% if status == "success" %}
+    <p>
+      Successful Submission
+    </p>
+    {% endif %}
+    {% if status == "error" %}
+    <p>
+      Error: {{ reason }}
+    </p>
+    {% endif %}
+  </main>
+</body>
