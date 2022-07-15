@@ -17,6 +17,9 @@ class FeatureAlreadyExistsError(DBInterfaceError):
 class ObservablePropertyExistsError(DBInterfaceError):
     pass
 
+class DataValidationError(DBInterfaceError):
+    pass
+
 class DBInterface:
     def __init__(self,graph_uri):
         self.graph = Graph()
@@ -151,7 +154,12 @@ class DBInterface:
                 continue
             if re.match(r"^\s*$",datum):
                 continue
-            datum = float(datum)
+            try:
+                datum = float(datum)
+            except ValueError as e:
+                raise DataValidationError(e)
+            except TypeError as e:
+                raise DataValidationError(e)
             unit = self.graph.value(prop,SDTW.hasUnit)
             propName = self.getLabel(prop)
             observationURI = os.path.join(data_prefix,"observations",featureName,propName,t)

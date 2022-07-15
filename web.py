@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
 from flask import render_template, redirect, url_for
-from db import DBInterface, RDFS
+from db import DBInterface, DataValidationError
 import urllib
 from datetime import datetime
 
@@ -41,15 +41,25 @@ def enterdata():
         status = request.args["status"]
     except KeyError:
         pass
+    reason = None
+    try:
+        reason = request.args["reason"]
+    except KeyError:
+        pass
+    print(status)
+    print(reason)
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
     props, headings = db.getColumnHeadings(feature)
     propheadings = list(zip([str(prop) for prop in props],headings))
-    return render_template("enterdata.html",featureName=featureName,feature=str(feature),propheadings=propheadings,status=status)
+    return render_template("enterdata.html",featureName=featureName,feature=str(feature),propheadings=propheadings,status=status,reason=reason)
 
 @app.route("/form/adddata",methods=["post"])
 def form_adddata():
     form = dict(request.form)
     feature = form.pop("feature")
-    db.enterData(feature,datetime.now().astimezone().replace(microsecond=0).isoformat(),USER,"",form)
+    try:
+        db.enterData(feature,datetime.now().astimezone().replace(microsecond=0).isoformat(),USER,"",form)
+    except DataValidationError as e:
+        return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=error&reason="+str(e))
     return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=success")

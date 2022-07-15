@@ -29,5 +29,10 @@
       Successful Submission
     </p>
     {% endif %}
+    {% if status == "error" %}
+    <p>
+      Error: {{ reason }}
+    </p>
+    {% endif %}
   </main>
 </body>
