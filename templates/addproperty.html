@@ -9,24 +9,32 @@
     Data Taking App: Add Property to {{ featureName }} Feature
   </h1>
   <nav>
-    <a href="/">Top<a>
+    <a href="/">Top</a>
   </nav>
   <main>
     <form action="form/addproperty" method="post">
       <p>
-        <label for="propname">Property Name:<label>
+        <label for="propname">Property Name:</label>
         <input type="text" id="propname" name="propname">
       </p>
       <p>
-        <label for="quantitykind">Kind of Quantity:<label>
-        <input type="text" id="quantitykind" name="quantitykind">
+        <label for="quantitykind">Kind of Quantity:</label>
+        <select id="quantitykind" name="quantitykind">
+          {% for qk in quantity_kind_list %}
+            <option value="{{qk}}">{{qk}}</option>
+          {% endfor %}
+        </select>
       </p>
       <p>
-        <label for="unit">Unit:<label>
-        <input type="text" id="unit" name="unit">
+        <label for="unit">Unit:</label>
+        <select id="unit" name="unit">
+          {% for unit in unit_list %}
+            <option value="{{unit}}">{{unit}}</option>
+          {% endfor %}
+        </select>
       </p>
       <p>
-        <label for="comment">Description:<label>
+        <label for="comment">Description:</label>
       </p>
       <p>
         <textarea name="comment" id="comment" rows="4" cols="45"></textarea>

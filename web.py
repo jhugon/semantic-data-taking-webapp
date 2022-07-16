@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
 from flask import render_template, redirect, url_for
-from db import DBInterface, DataValidationError
+from db import DBInterface, DataValidationError, GetSubjectError, QUDT
 import urllib
 from datetime import datetime
 
@@ -38,7 +38,7 @@ def addproperty():
     feature = request.args["feature"]
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
-    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib)
+    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib,quantity_kind_list=db.get_quantity_kind_labels(),unit_list=db.get_unit_labels())
 
 @app.route("/tableview")
 def tableview():
@@ -85,13 +85,23 @@ def form_addfeature():
 
 @app.route("/form/addproperty",methods=["post"])
 def form_addproperty():
-    featurename = request.form["featurename"]
+    feature = request.form["feature"]
+    propname = request.form["propname"]
     comment = request.form["comment"]
+    quantityKindLabel = request.form["quantitykind"]
+    unitLabel = request.form["unit"]
+    print(quantityKindLabel)
+    print(unitLabel)
     try:
-        db.addNewFeature(featurename,comment)
+        quantityKind = db.getSubjectLabeledWithType(quantityKindLabel,QUDT.QuantityKind,label_lang="en")
+        unit = db.getSubjectLabeledWithType(unitLabel,QUDT.Unit,label_lang="en-us")
+    except GetSubjectError as e:
+        return redirect(url_for("addproperty")+"?feature="+feature+"&"+"status=error&reason="+str(e))
+    try:
+        db.addNewObservableProperty(propname,comment,feature,quantityKind,unit)
     except Exception as e:
-        return redirect(url_for("main")+"?status=error&reason="+str(e))
-    return redirect(url_for("main")+"?status=success")
+        return redirect(url_for("addproperty")+"?feature="+feature+"&"+"status=error&reason="+str(e))
+    return redirect(url_for("addproperty")+"?feature="+feature+"&"+"status=success")
 
 @app.route("/form/adddata",methods=["post"])
 def form_adddata():

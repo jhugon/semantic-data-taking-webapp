@@ -8,6 +8,20 @@ QUDT = Namespace("http://qudt.org/schema/qudt/")
 
 data_prefix = "http://data-webapp.hugonlabs.com/test1/"
 
+units_query = """
+select ?unit_name
+where {
+    ?unit rdf:type qudt:Unit .
+    ?unit rdfs:label ?unit_name .
+}"""
+
+quantity_kind_query = """
+select ?qk_name
+where {
+    ?qk rdf:type qudt:QuantityKind .
+    ?qk rdfs:label ?qk_name .
+}"""
+
 class DBInterfaceError(Exception):
     pass
 
@@ -20,6 +34,9 @@ class ObservablePropertyExistsError(DBInterfaceError):
 class DataValidationError(DBInterfaceError):
     pass
 
+class GetSubjectError(DBInterfaceError):
+    pass
+
 class DBInterface:
     def __init__(self,graph_uri):
         self.graph = Graph()
@@ -30,6 +47,11 @@ class DBInterface:
         self.graph.parse("cache/qudt")
         self.graph.parse("cache/quantitykind")
         self.graph.parse("cache/unit")
+
+        self.unit_label_list = [str(row[0]) for row in self.graph.query(units_query)]
+        self.quantity_kind_label_list = [str(row[0]) for row in self.graph.query(quantity_kind_query)]
+
+        self.graph.serialize(destination="debug.ttl")
 
     def convertToURIRef(self,x):
         """
@@ -44,6 +66,23 @@ class DBInterface:
     def getLabel(self,x):
         x = self.convertToURIRef(x)
         return self.graph.value(x,RDFS.label).value
+
+    def getSubjectLabeledWithType(self,label,typ,label_lang=None):
+        label2 = Literal(label,lang=label_lang)
+        print(f"label2: {label2}")
+        subjects = list(self.graph.subjects(RDFS.label,label2))
+        print(f"subjects: {subjects}")
+        if len(subjects) < 1:
+            raise GetSubjectError(f"No subject with label '{label}'")
+        matching_subjects = set()
+        for subject in subjects:
+            if (subject,RDF.type,typ) in self.graph:
+                matching_subjects.add(subject)
+        if len(matching_subjects) == 0:
+            raise GetSubjectError(f"No subject with label '{label}' has type '{typ}'")
+        elif len(matching_subjects) > 1:
+            raise GetSubjectError(f"Multiple subjects with label '{label}' and type '{typ}'")
+        return subjects[0]
 
     def getComment(self,x):
         x = self.convertToURIRef(x)
@@ -74,6 +113,8 @@ class DBInterface:
     def addNewObservableProperty(self,label,comment,feature,quantityKind,unit):
         feature = self.convertToURIRef(feature)
         featureName = self.getLabel(feature)
+        if not re.match(r"^\w+$",label):
+            raise DataValidationError("Property label must be more than one letter, number, or _")
         propURI = os.path.join(data_prefix,"properties",featureName.lower(),label.lower())
         prop = URIRef(propURI)
         if (prop,None,None) in self.graph:
@@ -181,6 +222,12 @@ class DBInterface:
             self.graph.set((res,QUDT.value,Literal(datum)))
             self.graph.set((res,QUDT.unit,unit))
 
+    def get_quantity_kind_labels(self):
+        return self.quantity_kind_label_list
+
+    def get_unit_labels(self):
+        return self.unit_label_list
+
 
 if __name__ == "__main__":
     db = DBInterface("car-example.ttl")
@@ -189,9 +236,9 @@ if __name__ == "__main__":
     db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
     db.addNewObservableProperty("L1","Length of R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/Length","http://qudt.org/vocab/unit/M")
     #db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.2,'http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':0.05})
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.1,'http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':0.06})
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':0.1})
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.2','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.05'})
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.06'})
+    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1'})
     for feature in db.listFeatures():
         print(feature,db.getLabel(feature),db.getComment(feature))
         print(db.getColumnHeadings(feature))
