@@ -22,8 +22,6 @@ def main():
         reason = request.args["reason"]
     except KeyError:
         pass
-    print(status)
-    print(reason)
     return render_template("main.html",db=db,urllib=urllib,status=status,reason=reason)
 
 @app.route("/feature")
@@ -38,7 +36,17 @@ def addproperty():
     feature = request.args["feature"]
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
-    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib,quantity_kind_list=db.get_quantity_kind_list())
+    status = None
+    try:
+        status = request.args["status"]
+    except KeyError:
+        pass
+    reason = None
+    try:
+        reason = request.args["reason"]
+    except KeyError:
+        pass
+    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib,quantity_kind_list=db.get_quantity_kind_list(),status=status,reason=reason)
 
 @app.route("/selectpropertyunit")
 def selectpropertyunit():
@@ -59,9 +67,6 @@ def tableview():
     featureURLEncoded = urllib.parse.quote(feature, safe="")
     props, headings = db.getColumnHeadings(feature)
     stim_times, data = db.getData(feature)
-    print(featureName,headings)
-    print(stim_times)
-    print(data)
     return render_template("tableview.html",featureName=featureName,featureURLEncoded=featureURLEncoded,headings=headings,stim_times=stim_times,data=data,zip=zip)
 
 @app.route("/enterdata")
@@ -77,8 +82,6 @@ def enterdata():
         reason = request.args["reason"]
     except KeyError:
         pass
-    print(status)
-    print(reason)
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
     props, headings = db.getColumnHeadings(feature)
@@ -102,11 +105,6 @@ def form_addproperty():
     comment = request.form["comment"]
     quantityKind = request.form["quantitykind"]
     unit = request.form["unit"]
-    print(feature)
-    print(propname)
-    print(comment)
-    print(quantityKind)
-    print(unit)
     try:
         db.addNewObservableProperty(propname,comment,feature,quantityKind,unit)
     except Exception as e:
