@@ -12,7 +12,7 @@
     <a href="/">Top</a>
   </nav>
   <main>
-    <form action="form/addproperty" method="post">
+    <form action="selectpropertyunit" method="get">
       <p>
         <label for="propname">Property Name:</label>
         <input type="text" id="propname" name="propname">
@@ -21,15 +21,7 @@
         <label for="quantitykind">Kind of Quantity:</label>
         <select id="quantitykind" name="quantitykind">
           {% for qk in quantity_kind_list %}
-            <option value="{{qk}}">{{qk}}</option>
-          {% endfor %}
-        </select>
-      </p>
-      <p>
-        <label for="unit">Unit:</label>
-        <select id="unit" name="unit">
-          {% for unit in unit_list %}
-            <option value="{{unit}}">{{unit}}</option>
+            <option value="{{qk[0]}}">{{qk[1]}}</option>
           {% endfor %}
         </select>
       </p>

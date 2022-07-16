@@ -38,7 +38,19 @@ def addproperty():
     feature = request.args["feature"]
     featureName = db.getLabel(feature)
     featureURLEncoded = urllib.parse.quote(feature, safe="")
-    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib,quantity_kind_list=db.get_quantity_kind_labels(),unit_list=db.get_unit_labels())
+    return render_template("addproperty.html",feature=feature,featureName=featureName,featureURLEncoded=featureURLEncoded,urllib=urllib,quantity_kind_list=db.get_quantity_kind_list())
+
+@app.route("/selectpropertyunit")
+def selectpropertyunit():
+    feature = request.args["feature"]
+    propname = request.args["propname"]
+    comment = request.args["comment"]
+    quantityKind = request.args["quantitykind"]
+    quantityKindLabel = db.getLabel(quantityKind)
+    featureName = db.getLabel(feature)
+    units = db.get_units_for_quantity_kind(quantityKind)
+    return render_template("selectpropertyunit.html",feature=feature,featureName=featureName,propname=propname,comment=comment,quantityKind=quantityKind,quantityKindLabel=quantityKindLabel,units=units)
+
 
 @app.route("/tableview")
 def tableview():
@@ -88,15 +100,13 @@ def form_addproperty():
     feature = request.form["feature"]
     propname = request.form["propname"]
     comment = request.form["comment"]
-    quantityKindLabel = request.form["quantitykind"]
-    unitLabel = request.form["unit"]
-    print(quantityKindLabel)
-    print(unitLabel)
-    try:
-        quantityKind = db.getSubjectLabeledWithType(quantityKindLabel,QUDT.QuantityKind,label_lang="en")
-        unit = db.getSubjectLabeledWithType(unitLabel,QUDT.Unit,label_lang="en-us")
-    except GetSubjectError as e:
-        return redirect(url_for("addproperty")+"?feature="+feature+"&"+"status=error&reason="+str(e))
+    quantityKind = request.form["quantitykind"]
+    unit = request.form["unit"]
+    print(feature)
+    print(propname)
+    print(comment)
+    print(quantityKind)
+    print(unit)
     try:
         db.addNewObservableProperty(propname,comment,feature,quantityKind,unit)
     except Exception as e:
