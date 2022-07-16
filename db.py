@@ -135,7 +135,11 @@ class DBInterface:
         if (prop,None,None) in self.graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
         quantityKind = self.convertToURIRef(quantityKind)
+        if (quantityKind,RDF.type,QUDT.QuantityKind) not in self.graph:
+            raise DataValidationError(r"Quantity kind not found in database")
         unit = self.convertToURIRef(unit)
+        if (unit,RDF.type,QUDT.Unit) not in self.graph:
+            raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
         self.graph.add((prop,RDF.type,SOSA.ObservableProperty))
