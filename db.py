@@ -48,10 +48,9 @@ class DBInterface:
         self.graph.parse("cache/quantitykind")
         self.graph.parse("cache/unit")
 
-        self.unit_label_list = [str(row[0]) for row in self.graph.query(units_query)]
-        self.quantity_kind_label_list = [str(row[0]) for row in self.graph.query(quantity_kind_query)]
+        self.build_quantity_kind_list()
 
-        self.graph.serialize(destination="debug.ttl")
+        #self.graph.serialize(destination="debug.ttl")
 
     def convertToURIRef(self,x):
         """
@@ -65,7 +64,23 @@ class DBInterface:
 
     def getLabel(self,x):
         x = self.convertToURIRef(x)
-        return self.graph.value(x,RDFS.label).value
+        labels_set = set()
+        for label in self.graph.objects(x,RDFS.label):
+            labels_set.add(label)
+        labels = list(labels_set)
+        if len(labels) == 0:
+            raise DBInterfaceError(f"{x} has no label")
+        elif len(labels) == 1:
+            return labels[0].value
+        else:
+            label_langs = [l.language for l in labels]
+            en_us_count = label_langs.count("en-us")
+            if en_us_count > 0:
+                return labels[label_langs.index("en-us")].value
+            en_count = label_langs.count("en")
+            if en_count > 0:
+                return labels[label_langs.index("en")].value
+            return labels[0].value
 
     def getSubjectLabeledWithType(self,label,typ,label_lang=None):
         label2 = Literal(label,lang=label_lang)
@@ -222,11 +237,25 @@ class DBInterface:
             self.graph.set((res,QUDT.value,Literal(datum)))
             self.graph.set((res,QUDT.unit,unit))
 
-    def get_quantity_kind_labels(self):
-        return self.quantity_kind_label_list
+    def get_quantity_kind_list(self):
+        return self.quantity_kind_and_label_list
 
-    def get_unit_labels(self):
-        return self.unit_label_list
+    def build_quantity_kind_list(self):
+        self.quantity_kinds = list(self.graph.subjects(RDF.type,QUDT.QuantityKind))
+        self.quantity_kind_and_label_list = []
+        for quantity_kind in self.quantity_kinds:
+            label = self.getLabel(quantity_kind)
+            self.quantity_kind_and_label_list.append((str(quantity_kind),label))
+        self.quantity_kind_and_label_list.sort(key=lambda x: x[1])
+
+    def get_units_for_quantity_kind(self,quantity_kind):
+        quantity_kind = self.convertToURIRef(quantity_kind)
+        results = []
+        for unit in self.graph.objects(quantity_kind,QUDT.applicableUnit):
+            label = self.getLabel(unit)
+            results.append((str(unit),label))
+        results.sort(key=lambda x: x[1])
+        return results
 
 
 if __name__ == "__main__":
