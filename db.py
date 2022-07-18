@@ -1,4 +1,4 @@
-from rdflib import Graph, Namespace, URIRef, BNode, Literal
+from rdflib import ConjunctiveGraph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 from rdflib.store import NO_STORE, VALID_STORE
 import os.path
@@ -42,35 +42,30 @@ class DBStoreError(DBInterfaceError):
     pass
 
 class DBInterface:
-    def __init__(self,graph_uri):
-        self.graph_uri = graph_uri
-        self.store_path = "web-db-store.bdb"
-        self.graph = Graph("BerkeleyDB")
-        opencode = self.graph.open(self.store_path,create=False)
-        if opencode == NO_STORE:
-            self.setup_store()
-        elif opencode == VALID_STORE:
-            self.graph.commit()
-            pass
-        else:
-            raise DBStoreError(f"Database store at 'self.store_path' is corrupted")
-
-        print(f"graph len: {len(self.graph)}")
-            
+    def __init__(self,store_path="web-db-store.bdb"):
+        self.store_path = store_path
+        self.graph = self.load_graph(self.store_path)
         self.build_quantity_kind_list()
-
-        self.graph.serialize(destination="debug.ttl")
+        #self.graph.serialize(destination="debug.ttl")
 
     def __del__(self):
         self.graph.close()
 
-    def setup_store(self):
-        self.graph.open(self.store_path,create=True)
-        self.graph.parse(self.graph_uri)
-        self.graph.parse("http://qudt.org/schema/qudt/")
-        self.graph.parse("http://qudt.org/vocab/quantitykind/")
-        self.graph.parse("http://qudt.org/vocab/unit/")
-        self.graph.commit()
+    def load_graph(self,store_path):
+        graph = ConjunctiveGraph("BerkeleyDB")
+        opencode = graph.open(store_path,create=False)
+        if opencode == NO_STORE:
+            graph.open(store_path,create=True)
+            graph.parse("http://qudt.org/schema/qudt/")
+            graph.parse("http://qudt.org/vocab/quantitykind/")
+            graph.parse("http://qudt.org/vocab/unit/")
+            graph.commit()
+            graph.close()
+            return self.load_graph(store_path)
+        elif opencode == VALID_STORE:
+            return graph
+        else:
+            raise DBStoreError(f"Database store at 'store_path' is corrupted")
 
     def convertToURIRef(self,x):
         """
@@ -286,15 +281,15 @@ class DBInterface:
 
 
 if __name__ == "__main__":
-    db = DBInterface("car-example.ttl")
-    db.addNewFeature("joke1","nock, nock: who's there?")
-    #db.addNewFeature("car1","bad car")
-    db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
-    db.addNewObservableProperty("L1","Length of R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/Length","http://qudt.org/vocab/unit/M")
-    #db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.2','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.05'})
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.06'})
-    db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1'})
+    db = DBInterface()
+    #db.addNewFeature("joke1","nock, nock: who's there?")
+    ##db.addNewFeature("car1","bad car")
+    #db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
+    #db.addNewObservableProperty("L1","Length of R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/Length","http://qudt.org/vocab/unit/M")
+    ##db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
+    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.2','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.05'})
+    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.06'})
+    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1'})
     for feature in db.listFeatures():
         print(feature,db.getLabel(feature),db.getComment(feature))
         print(db.getColumnHeadings(feature))

@@ -6,7 +6,7 @@ import urllib
 from datetime import datetime
 
 app = Flask(__name__)
-db = DBInterface("car-example.ttl")
+db = DBInterface()
 
 USER="http://data-webapp.hugonlabs.com/test1/users/jhugon"
 
