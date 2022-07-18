@@ -1,5 +1,6 @@
 from rdflib import Graph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
+from rdflib.store import NO_STORE, VALID_STORE
 import os.path
 import re
 
@@ -37,20 +38,39 @@ class DataValidationError(DBInterfaceError):
 class GetSubjectError(DBInterfaceError):
     pass
 
+class DBStoreError(DBInterfaceError):
+    pass
+
 class DBInterface:
     def __init__(self,graph_uri):
-        self.graph = Graph()
-        self.graph.parse(graph_uri)
-        #self.graph.parse("http://qudt.org/schema/qudt")
-        #self.graph.parse("http://qudt.org/vocab/quantitykind")
-        #self.graph.parse("http://qudt.org/vocab/unit")
-        self.graph.parse("cache/qudt")
-        self.graph.parse("cache/quantitykind")
-        self.graph.parse("cache/unit")
+        self.graph_uri = graph_uri
+        self.store_path = "web-db-store.bdb"
+        self.graph = Graph("BerkeleyDB")
+        opencode = self.graph.open(self.store_path,create=False)
+        if opencode == NO_STORE:
+            self.setup_store()
+        elif opencode == VALID_STORE:
+            self.graph.commit()
+            pass
+        else:
+            raise DBStoreError(f"Database store at 'self.store_path' is corrupted")
 
+        print(f"graph len: {len(self.graph)}")
+            
         self.build_quantity_kind_list()
 
-        #self.graph.serialize(destination="debug.ttl")
+        self.graph.serialize(destination="debug.ttl")
+
+    def __del__(self):
+        self.graph.close()
+
+    def setup_store(self):
+        self.graph.open(self.store_path,create=True)
+        self.graph.parse(self.graph_uri)
+        self.graph.parse("http://qudt.org/schema/qudt/")
+        self.graph.parse("http://qudt.org/vocab/quantitykind/")
+        self.graph.parse("http://qudt.org/vocab/unit/")
+        self.graph.commit()
 
     def convertToURIRef(self,x):
         """
@@ -119,6 +139,7 @@ class DBInterface:
         self.graph.add((feature,RDF.type,SOSA.FeatureOfInterest))
         self.graph.set((feature,RDFS.label,Literal(label)))
         self.graph.set((feature,RDFS.comment,Literal(comment)))
+        self.graph.commit()
 
     def listObservableProperties(self,featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
@@ -148,6 +169,7 @@ class DBInterface:
         self.graph.set((prop,SSN.isPropertyOf,feature))
         self.graph.set((prop,SDTW.hasQuantityKind,quantityKind))
         self.graph.set((prop,SDTW.hasUnit,unit))
+        self.graph.commit()
 
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
@@ -240,6 +262,7 @@ class DBInterface:
             self.graph.set((res,RDF.type,QUDT.Quantity))
             self.graph.set((res,QUDT.value,Literal(datum)))
             self.graph.set((res,QUDT.unit,unit))
+        self.graph.commit()
 
     def get_quantity_kind_list(self):
         return self.quantity_kind_and_label_list
