@@ -59,6 +59,8 @@ class DBInterface:
             graph.parse("http://qudt.org/schema/qudt/")
             graph.parse("http://qudt.org/vocab/quantitykind/")
             graph.parse("http://qudt.org/vocab/unit/")
+            graph.parse("ontology/sdtw.ttl")
+            graph.parse("ontology/units.ttl")
             graph.commit()
             graph.close()
             return self.load_graph(store_path)

@@ -1,0 +1,47 @@
+@base <http://schema.hugonlabs.com/sdtw#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
+@prefix quantityKind: <http://qudt.org/vocab/quantitykind/> .
+@prefix qkdv: <http://qudt.org/vocab/dimensionvector/> .
+@prefix sou: <http://qudt.org/vocab/sou/> .
+
+## Quantity Kinds
+
+<FuelEconomyDistancePerVolume> rdf:type qudt:QuantityKind ;
+    rdfs:label "Fuel Economy (Distance per Unit Volume)"@en ;
+    rdfs:isDefinedBy <http://schema.hugonlabs.com/sdtw#> ;
+    qudt:hasDimensionVector qkdv:A0E0L-2I0M0H0T0D0 ;
+    qudt:applicableUnit <MI-PER-US_GAL> ;
+    .
+
+<FuelPricePerVolume> rdf:type qudt:QuantityKind ;
+    rdfs:label "Fuel Price (Currency per Unit Volume)"@en ;
+    rdfs:isDefinedBy <http://schema.hugonlabs.com/sdtw#> ;
+    qudt:hasDimensionVector qkdv:A0E0L-3I0M0H0T0D0 ;
+    qudt:applicableUnit <USDollar-PER-US_GAL> ;
+    .
+
+## Units
+
+<MI-PER-US_GAL> rdf:type qudt:Unit ;
+    rdfs:label "Mile per US Gallon"@en ;
+    rdfs:isDefinedBy <http://schema.hugonlabs.com/sdtw#> ;
+    qudt:hasDimensionVector qkdv:A0E0L-2I0M0H0T0D0 ;
+    qudt:hasQuantityKind <FuelEconomyDistancePerVolume> ;
+    qudt:unitOfSystem sou:IMPERIAL ;
+    qudt:symbol "MPG" ;
+    .
+
+<USDollar-PER-US_GAL> rdf:type qudt:Unit ;
+    rdfs:label "US Dollar per US Gallon"@en ;
+    rdfs:isDefinedBy <http://schema.hugonlabs.com/sdtw#> ;
+    qudt:hasDimensionVector qkdv:A0E0L-3I0M0H0T0D0 ;
+    qudt:hasQuantityKind <FuelPricePerVolume> ;
+    qudt:unitOfSystem sou:IMPERIAL ;
+    qudt:symbol "US$/Gal" ;
+    .
+
+

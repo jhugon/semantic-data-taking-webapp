@@ -36,18 +36,15 @@ Ontology(<http://ontology.hugonlabs.com/sdtw#>
 
   ##########################################
   
-  Declaration(ObjectProperty(sdtw:hasTime))
-  Declaration(ObjectProperty(sdtw:hasQualityKind))
-  Declaration(ObjectProperty(sdtw:hasUnit))
-  
-  ##########################################
-  
+  Declaration(ObjectProperty(:hasTime))
   ObjectPropertyDomain(:hasTime ssn:Stimulus ) 
   ObjectPropertyRange( :hasTime xsd:dateTime ) 
   
+  Declaration(ObjectProperty(:hasQualityKind))
   ObjectPropertyDomain(:hasQualityKind sosa:ObservableProperty )
   ObjectPropertyRange( :hasQualityKind qudt:QuantityKind ) 
-  
+
+  Declaration(ObjectProperty(:hasUnit))
   ObjectPropertyDomain(:hasUnit sosa:ObservableProperty )
   ObjectPropertyRange( :hasUnit qudt:Unit ) 
 )

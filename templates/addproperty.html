@@ -15,7 +15,7 @@
     <form action="selectpropertyunit" method="get">
       <p>
         <label for="propname">Property Name:</label>
-        <input type="text" id="propname" name="propname">
+        <input type="text" id="propname" name="propname" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _" >
       </p>
       <p>
         <label for="quantitykind">Kind of Quantity:</label>
