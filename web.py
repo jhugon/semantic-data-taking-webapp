@@ -152,3 +152,6 @@ def form_adddata():
     except DataValidationError as e:
         return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=error&reason="+str(e))
     return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=success")
+
+if __name__ == "__main__":
+    app.run()
