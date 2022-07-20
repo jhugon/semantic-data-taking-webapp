@@ -1,14 +1,9 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App
-  </title>
-</head>
-<body>
-  <h1>
-    Data taking App
-  </h1>
-  <main>
+{% extends "base.html" %}
+{% block title %}Select Feature{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
     <h2>
       Features:
     </h2>
@@ -45,5 +40,4 @@
       Error: {{ reason }}
     </p>
     {% endif %}
-  </main>
-</body>
+{% endblock %}
