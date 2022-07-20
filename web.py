@@ -1,12 +1,13 @@
 from flask import Flask
 from flask import request
 from flask import render_template, redirect, url_for
-from db import DBInterface, DataValidationError, GetSubjectError, QUDT
+from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, QUDT
 import urllib
 from datetime import datetime
+import os.path
 
+from flask_login import LoginManager, current_user
 from flask_simple_login import (
-    login_manager,
     auth,
     User,
     login_required,
@@ -16,12 +17,21 @@ app = Flask(__name__)
 db = DBInterface()
 
 app.register_blueprint(auth)
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
 login_manager.init_app(app)
+
+## Modify User to have a uri
+@login_manager.user_loader
+def load_user(user_id):
+    u = User(user_id)
+    u.uri = os.path.join(user_prefix,user_id)
+    return u
+
+
 app.config["SECRET_KEY"] = b"dummy"
 app.config["SESSION_PROTECTION"] = "strong"
 
-
-USER="http://data-webapp.hugonlabs.com/test1/users/jhugon"
 
 @app.route("/")
 @login_required
@@ -136,8 +146,9 @@ def form_addproperty():
 def form_adddata():
     form = dict(request.form)
     feature = form.pop("feature")
+    user_uri = current_user.uri
     try:
-        db.enterData(feature,datetime.now().astimezone().replace(microsecond=0).isoformat(),USER,"",form)
+        db.enterData(feature,datetime.now().astimezone().replace(microsecond=0).isoformat(),user_uri,"",form)
     except DataValidationError as e:
         return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=error&reason="+str(e))
     return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=success")
