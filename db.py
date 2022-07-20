@@ -8,6 +8,7 @@ SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
 data_prefix = "http://data-webapp.hugonlabs.com/test1/"
+user_prefix = os.path.join(data_prefix,"users/")
 
 units_query = """
 select ?unit_name

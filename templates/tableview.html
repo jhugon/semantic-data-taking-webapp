@@ -1,27 +1,14 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App: Data Table View of {{ featureName }} Feature
-  </title>
-  <style>
-    table {
-      border-collapse: collapse;
-    }
-    td, th {
-      border: 1px solid #dddddd;
-      padding: 8px;
-    }
-  </style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Data Table View of {{ featureName }} Feature {% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
   <h1>
-    Data Taking App: Data Table View of {{ featureName }} Feature
+    Data Table View of {{ featureName }} Feature
   </h1>
-  <nav>
-    <a href="/">Top</a>
-  </nav>
   <main>
-    <table>
+    <table class="table table-striped">
       <tr>
         <th>
             Timestamp
@@ -45,5 +32,4 @@
         </tr>
       {% endfor %}
     </table>
-  </main>
-</body>
+{% endblock %}

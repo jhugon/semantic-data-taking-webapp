@@ -1,17 +1,12 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App: Select Unit for New Property {{ propname }} on Feature {{ featureName }}
-  </title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Select Unit for New Property {{ propname }} on Feature {{ featureName }}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
   <h1>
-    Data Taking App: Select Unit for New Property {{ propname }} on Feature {{ featureName }}
+    Select Unit for New Property {{ propname }} on Feature {{ featureName }}
   </h1>
-  <nav>
-    <a href="/">Top</a>
-  </nav>
-  <main>
     <form action="form/addproperty" method="post">
       <p>
         <label for="unit">Unit:</label>
@@ -34,7 +29,6 @@
       <input type="text" id="quantitykind" name="quantitykind" value="{{quantityKind}}" readonly hidden>
       <input name="comment" id="comment" value="{{comment}}" readonly hidden>
       <input type="text" name="feature" value="{{feature}}" readonly hidden>
-      <input type="submit" value="Submit">
+      <input type="submit" value="Submit" class="btn btn-primary">
     </form>
-  </main>
-</body>
+{% endblock %}

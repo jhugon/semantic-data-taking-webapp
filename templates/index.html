@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Select Feature{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <h2>
+      Features:
+    </h2>
+    {% for feature in db.listFeatures() %}
+      {% set featureName = db.getLabel(feature) %}
+      {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
+      <p>
+          <a class="btn btn-primary" href="feature?feature={{ featureURLEncoded }}">{{ featureName }}</a>
+      </p>
+    {% endfor %}
+    <h2>
+      Add New Feature:
+    </h2>
+    <form action="form/addfeature" method="post">
+      <p>
+        <label for="featurename" class="form-label">Feature name:<label>
+      </p>
+      <p>
+        <input type="text" name="featurename" id="featurename" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _" class="form-control">
+      </p>
+      <p>
+        <label for="comment" class="form-label">Description:<label>
+      </p>
+      <p>
+        <textarea name="comment" id="comment" rows="4" cols="45" class="form-control"></textarea>
+      </p>
+      <input type="submit" value="Submit" class="btn btn-secondary">
+    </form>
+    {% if status == "success" %}
+    <p>
+      Successful Submission
+    </p>
+    {% endif %}
+    {% if status == "error" %}
+    <p>
+      Error: {{ reason }}
+    </p>
+    {% endif %}
+{% endblock %}

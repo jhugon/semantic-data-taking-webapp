@@ -7,8 +7,9 @@ name = "pypi"
 rdflib = "*"
 flask = "*"
 berkeleydb = "*"
+flask-simple-login = {editable = true, path = "./flask-simple-login"}
 
 [dev-packages]
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
