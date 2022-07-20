@@ -2,22 +2,13 @@
 {% block title %}Data Table View of {{ featureName }} Feature {% endblock %}
 {% block head %}
     {{ super() }}
-  <style>
-    table {
-      border-collapse: collapse;
-    }
-    td, th {
-      border: 1px solid #dddddd;
-      padding: 8px;
-    }
-  </style>
 {% endblock %}
 {% block content %}
   <h1>
     Data Table View of {{ featureName }} Feature
   </h1>
   <main>
-    <table>
+    <table class="table table-striped">
       <tr>
         <th>
             Timestamp

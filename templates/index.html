@@ -11,7 +11,7 @@
       {% set featureName = db.getLabel(feature) %}
       {% set featureURLEncoded = urllib.parse.quote(feature, safe="") %}
       <p>
-          <a href="feature?feature={{ featureURLEncoded }}">{{ featureName }}</a>
+          <a class="btn btn-primary" href="feature?feature={{ featureURLEncoded }}">{{ featureName }}</a>
       </p>
     {% endfor %}
     <h2>
@@ -19,16 +19,18 @@
     </h2>
     <form action="form/addfeature" method="post">
       <p>
-        <label for="featurename">Feature name:<label>
-        <input type="text" name="featurename" id="featurename" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _">
+        <label for="featurename" class="form-label">Feature name:<label>
       </p>
       <p>
-        <label for="comment">Description:<label>
+        <input type="text" name="featurename" id="featurename" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _" class="form-control">
       </p>
       <p>
-        <textarea name="comment" id="comment" rows="4" cols="45"></textarea>
+        <label for="comment" class="form-label">Description:<label>
       </p>
-      <input type="submit" value="Submit">
+      <p>
+        <textarea name="comment" id="comment" rows="4" cols="45" class="form-control"></textarea>
+      </p>
+      <input type="submit" value="Submit" class="btn btn-secondary">
     </form>
     {% if status == "success" %}
     <p>
