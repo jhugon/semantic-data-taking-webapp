@@ -1,8 +1,7 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App: Data Table View of {{ featureName }} Feature
-  </title>
+{% extends "base.html" %}
+{% block title %}Data Table View of {{ featureName }} Feature {% endblock %}
+{% block head %}
+    {{ super() }}
   <style>
     table {
       border-collapse: collapse;
@@ -12,14 +11,11 @@
       padding: 8px;
     }
   </style>
-</head>
-<body>
+{% endblock %}
+{% block content %}
   <h1>
-    Data Taking App: Data Table View of {{ featureName }} Feature
+    Data Table View of {{ featureName }} Feature
   </h1>
-  <nav>
-    <a href="/">Top</a>
-  </nav>
   <main>
     <table>
       <tr>
@@ -45,5 +41,4 @@
         </tr>
       {% endfor %}
     </table>
-  </main>
-</body>
+{% endblock %}

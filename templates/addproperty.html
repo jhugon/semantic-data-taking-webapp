@@ -1,17 +1,12 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App: Add Property to {{ featureName }} Feature
-  </title>
-</head>
-<body>
-  <h1>
-    Data Taking App: Add Property to {{ featureName }} Feature
-  </h1>
-  <nav>
-    <a href="/">Top</a>
-  </nav>
-  <main>
+{% extends "base.html" %}
+{% block title %}Add Property to {{ featureName }} Feature{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+  <h2>
+    Add Property to {{ featureName }} Feature
+  </h2>
     <form action="selectpropertyunit" method="get">
       <p>
         <label for="propname">Property Name:</label>
@@ -45,5 +40,4 @@
       Error: {{ reason }}
     </p>
     {% endif %}
-  </main>
-</body>
+{% endblock %}

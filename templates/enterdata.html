@@ -1,16 +1,12 @@
-<!doctype html>
-<head>
-  <title>
-    Data Taking App: Enter Data into {{ featureName }} Feature
-  </title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Enter Data into {{ featureName }} Feature{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
   <h1>
-    Data Taking App: Enter Data into {{ featureName }} Feature
+    Enter Data into {{ featureName }} Feature
   </h1>
-  <nav>
-    <a href="/">Top</a>
-  </nav>
   <main>
     <form action="form/adddata" method="post">
       {% for propheading in propheadings %}
@@ -34,5 +30,4 @@
       Error: {{ reason }}
     </p>
     {% endif %}
-  </main>
-</body>
+{% endblock %}

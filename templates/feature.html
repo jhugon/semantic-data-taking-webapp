@@ -1,17 +1,13 @@
 <!doctype html>
-<head>
-  <title>
-    Data Taking App: {{ featureName }} Feature
-  </title>
-</head>
-<body>
-  <h1>
-    Data taking App: {{ featureName }} Feature
-  </h1>
-  <nav>
-    <a href="/">Top<a>
-  </nav>
-  <main>
+{% extends "base.html" %}
+{% block title %}{{featureName}} Feature{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+  <h2>
+    {{ featureName }} Feature
+  </h2>
     <p>
         <a href="/tableview?feature={{ featureURLEncoded }}">View Data Table</a>
     </p>
@@ -21,5 +17,4 @@
     <p>
         <em><a href="/addproperty?feature={{ featureURLEncoded }}">Add New Property</a></em>
     </p>
-  </main>
-</body>
+{% endblock %}
