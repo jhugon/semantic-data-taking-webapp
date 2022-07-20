@@ -1,0 +1,3 @@
+[submodule "flask-simple-login"]
+	path = flask-simple-login
+	url = git@github.com:jhugon/flask-simple-login.git

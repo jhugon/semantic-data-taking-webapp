@@ -4,6 +4,21 @@ This app is a Flask-based dynamic website that uses an RDF graph database to sto
 
 ## Run Test Server
 
+Set things up:
+
+```bash
+pipenv install
+pipenv shell
+```
+
+Create a user:
+
+```bash
+flask-simple-login-gen-user-file-line > userfile.txt
+```
+
+Run the server:
+
 ```bash
 export FLASK_APP=web.py
 export FLASK_ENV=development
