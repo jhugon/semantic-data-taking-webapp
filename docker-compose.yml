@@ -1,9 +1,11 @@
 version: "3.9"  # optional since v1.27.0
 services:
-  semantic-app:
-    build: .
+  #semantic-app:
+  #  build: .
+  #  volumes:
+  #    - ./web-db-store.bdb:/app/web-db-store.bdb
+  #    - ./userfile.txt:/app/userfile.txt
+  reverse-proxy:
+    build: ./nginx
     ports:
-      - "8000:8000"
-    volumes:
-      - ./web-db-store.bdb:/app/web-db-store.bdb
-      - ./userfile.txt:/app/userfile.txt
+      - "8080:80"
