@@ -5,6 +5,8 @@ services:
     volumes:
       - ./web-db-store.bdb:/app/web-db-store.bdb
       - ./userfile.txt:/app/userfile.txt
+    #ports:
+    #  - "8000:8000"
   reverse-proxy:
     build: ./nginx
     ports:

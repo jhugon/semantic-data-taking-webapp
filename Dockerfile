@@ -1,8 +1,14 @@
 # syntax=docker/dockerfile:1
 FROM python:3.10
 
-COPY . /app
 WORKDIR /app
+COPY Pipfile .
+COPY Pipfile.lock .
+COPY db.py .
+COPY flask-simple-login flask-simple-login
+COPY ontology ontology
+COPY templates templates
+COPY web.py .
 
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
