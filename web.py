@@ -16,6 +16,7 @@ import urllib
 from datetime import datetime
 import os.path
 import logging
+import sys
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,13 +27,21 @@ app = Flask(__name__)
 app.config["DB_STORE_PATH"] = "web-db-store.bdb"
 app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"
 app.config["DB_USERS_URI_BASE"] = os.path.join(app.config["DB_DATA_URI_BASE"],"users/")
-
 app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
-app.config["SERVER_NAME"] = "semweb.localhost"
 app.config["PROXY_FORWARDING"] = True
 
-app.config["SECRET_KEY"] = b"dummy"
+app.config["SERVER_NAME"] = "semweb.localhost"
 app.config["SESSION_PROTECTION"] = "strong"
+app.config["SECRET_KEY"] = b"dummy"
+
+## override above with contents of file in this environment variable:
+try:
+    app.config.from_envvar("SEMWEB_SETTINGS")
+except RuntimeError as e:
+    app.logger.warning(e)
+## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
+app.config.from_prefixed_env()
+
 for key in sorted(app.config.keys()):
     if "SECRET" not in key:
         app.logger.info("{:30} = {}".format(key,app.config[key]))
