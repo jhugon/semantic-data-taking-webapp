@@ -4,7 +4,7 @@ from flask import render_template, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
 
-from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, QUDT
+from db import DBInterface, DataValidationError, GetSubjectError, QUDT
 from flask_simple_login import (
     auth,
     User,
@@ -24,6 +24,9 @@ app = Flask(__name__)
 #### Configuration ###################
 
 app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"
+app.config["DB_USERS_URI_BASE"] = os.path.join(app.config["DB_DATA_URI_BASE"],"users/")
+
 app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
 app.config["SERVER_NAME"] = "semweb.localhost"
 app.config["PROXY_FORWARDING"] = True
@@ -36,7 +39,7 @@ for key in sorted(app.config.keys()):
 
 #######################################
 
-db = DBInterface(app.config["DB_STORE_PATH"])
+db = DBInterface(app.config["DB_STORE_PATH"],app.config["DB_DATA_URI_BASE"])
 
 app.register_blueprint(auth)
 login_manager = LoginManager()
@@ -47,7 +50,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     u = User(user_id)
-    u.uri = os.path.join(user_prefix,user_id)
+    u.uri = os.path.join(app.config["DB_USERS_URI_BASE"],user_id)
     return u
 
 if app.config["PROXY_FORWARDING"]:

@@ -7,11 +7,7 @@ import logging
 
 LOGGER = logging.getLogger(__name__)
 
-SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
-
-data_prefix = "http://data-webapp.hugonlabs.com/test1/"
-user_prefix = os.path.join(data_prefix,"users/")
 
 units_query = """
 select ?unit_name
@@ -46,13 +42,16 @@ class DBStoreError(DBInterfaceError):
     pass
 
 class DBInterface:
-    def __init__(self,store_path="web-db-store.bdb"):
+    def __init__(self,store_path="web-db-store.bdb",data_prefix="http://data-webapp.hugonlabs.com/test1/"):
         store_path = os.path.abspath(store_path)
         LOGGER.info(f"DB store at: {store_path}")
         self.store_path = store_path
         self.graph = self.load_graph(self.store_path)
         self.build_quantity_kind_list()
         #self.graph.serialize(destination="debug.ttl")
+
+        self.SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
+        self.data_prefix = data_prefix
 
     def __del__(self):
         try:
@@ -141,7 +140,7 @@ class DBInterface:
     def addNewFeature(self,label,comment):
         if not re.match(r"^\w+$",label):
             raise DataValidationError("Feature label must be more than one letter, number, or _")
-        featureURI = os.path.join(data_prefix,"features",label.lower())
+        featureURI = os.path.join(self.data_prefix,"features",label.lower())
         feature = URIRef(featureURI)
         if (feature,None,None) in self.graph:
             raise FeatureAlreadyExistsError(f"Feature with label '{label}' is already in graph")
@@ -160,7 +159,7 @@ class DBInterface:
         featureName = self.getLabel(feature)
         if not re.match(r"^\w+$",label):
             raise DataValidationError("Property label must be more than one letter, number, or _")
-        propURI = os.path.join(data_prefix,"properties",featureName.lower(),label.lower())
+        propURI = os.path.join(self.data_prefix,"properties",featureName.lower(),label.lower())
         prop = URIRef(propURI)
         if (prop,None,None) in self.graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
@@ -176,14 +175,14 @@ class DBInterface:
         self.graph.set((prop,RDFS.label,label))
         self.graph.set((prop,RDFS.comment,comment))
         self.graph.set((prop,SSN.isPropertyOf,feature))
-        self.graph.set((prop,SDTW.hasQuantityKind,quantityKind))
-        self.graph.set((prop,SDTW.hasUnit,unit))
+        self.graph.set((prop,self.SDTW.hasQuantityKind,quantityKind))
+        self.graph.set((prop,self.SDTW.hasUnit,unit))
         self.graph.commit()
 
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         label = self.getLabel(observedProperty)
-        unit = self.graph.value(observedProperty,SDTW.hasUnit)
+        unit = self.graph.value(observedProperty,self.SDTW.hasUnit)
         unit_label = self.graph.value(unit,QUDT.symbol)
         result = f"{label} [{unit_label}]"
         return result
@@ -201,8 +200,8 @@ class DBInterface:
         for prop in props:
             for stimulus in self.graph.subjects(SSN.isProxyFor,prop):
                 stimuli.add(stimulus)
-        stimuli = sorted(list(stimuli),key=lambda t: self.graph.value(t,SDTW.hasTime).value)
-        stim_times = [self.graph.value(stimulus,SDTW.hasTime).value for stimulus in stimuli]
+        stimuli = sorted(list(stimuli),key=lambda t: self.graph.value(t,self.SDTW.hasTime).value)
+        stim_times = [self.graph.value(stimulus,self.SDTW.hasTime).value for stimulus in stimuli]
         data = []
         for stimulus in stimuli:
             stim_data = []
@@ -233,11 +232,11 @@ class DBInterface:
         sensor = self.convertToURIRef(sensor)
         featureName = self.getLabel(feature)
         props = list(self.listObservableProperties(feature))
-        stimulusURI = os.path.join(data_prefix,"stimuli",featureName.lower(),t.upper())
+        stimulusURI = os.path.join(self.data_prefix,"stimuli",featureName.lower(),t.upper())
         stimulus = self.convertToURIRef(stimulusURI)
         self.graph.add((stimulus,RDF.type,SSN.Stimulus))
         self.graph.set((stimulus,RDFS.comment,Literal(comment)))
-        self.graph.set((stimulus,SDTW.hasTime,Literal(t,datatype=XSD.dateTime)))
+        self.graph.set((stimulus,self.SDTW.hasTime,Literal(t,datatype=XSD.dateTime)))
         for prop in props:
             prop = self.convertToURIRef(prop)
             datum = None
@@ -253,9 +252,9 @@ class DBInterface:
                 raise DataValidationError(e)
             except TypeError as e:
                 raise DataValidationError(e)
-            unit = self.graph.value(prop,SDTW.hasUnit)
+            unit = self.graph.value(prop,self.SDTW.hasUnit)
             propName = self.getLabel(prop)
-            observationURI = os.path.join(data_prefix,"observations",featureName,propName,t)
+            observationURI = os.path.join(self.data_prefix,"observations",featureName,propName,t)
             observation = self.convertToURIRef(observationURI)
             self.graph.add((stimulus,SSN.isProxyFor,prop))
             self.graph.add((observation,RDF.type,SOSA.Observation))
