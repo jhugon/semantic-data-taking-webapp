@@ -55,7 +55,10 @@ class DBInterface:
         #self.graph.serialize(destination="debug.ttl")
 
     def __del__(self):
-        self.graph.close()
+        try:
+            self.graph.close()
+        except Exception:
+            pass
 
     def load_graph(self,store_path):
         graph = ConjunctiveGraph("BerkeleyDB")

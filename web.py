@@ -7,7 +7,7 @@ from datetime import datetime
 import os.path
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 from flask_login import LoginManager, current_user
 from flask_simple_login import (
@@ -17,7 +17,22 @@ from flask_simple_login import (
 )
 
 app = Flask(__name__)
-db = DBInterface()
+
+#### Configuration ###################
+
+app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
+#app.config["SERVER_NAME"] = "localhost" # doesn't seem to work with my proxy settings
+
+app.config["SECRET_KEY"] = b"dummy"
+app.config["SESSION_PROTECTION"] = "strong"
+for key in sorted(app.config.keys()):
+    if "SECRET" not in key:
+        app.logger.info("{:30} = {}".format(key,app.config[key]))
+
+#######################################
+
+db = DBInterface(app.config["DB_STORE_PATH"])
 
 app.register_blueprint(auth)
 login_manager = LoginManager()
@@ -32,17 +47,11 @@ def load_user(user_id):
     return u
 
 
-app.config["SECRET_KEY"] = b"dummy"
-app.config["SESSION_PROTECTION"] = "strong"
-
-for key in sorted(app.config.keys()):
-    if "SECRET" not in key:
-        app.logger.info("{:30} = {}".format(key,app.config[key]))
-
-
 @app.route("/")
 @login_required
 def index():
+    app.logger.debug(request.headers)
+    app.logger.debug(request.host)
     status = None
     try:
         status = request.args["status"]
