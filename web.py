@@ -1,20 +1,54 @@
 from flask import Flask
 from flask import request
 from flask import render_template, redirect, url_for
-from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, QUDT
-import urllib
-from datetime import datetime
-import os.path
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
+
+from db import DBInterface, DataValidationError, GetSubjectError, QUDT
 from flask_simple_login import (
     auth,
     User,
     login_required,
 )
 
+
+import urllib
+from datetime import datetime
+import os.path
+import logging
+import sys
+
+logging.basicConfig(level=logging.INFO)
+
 app = Flask(__name__)
-db = DBInterface()
+
+#### Configuration ###################
+
+app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"
+app.config["DB_USERS_URI_BASE"] = os.path.join(app.config["DB_DATA_URI_BASE"],"users/")
+app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
+app.config["PROXY_FORWARDING"] = True
+
+app.config["SERVER_NAME"] = "semweb.localhost"
+app.config["SESSION_PROTECTION"] = "strong"
+app.config["SECRET_KEY"] = b"dummy"
+
+## override above with contents of file in this environment variable:
+try:
+    app.config.from_envvar("SEMWEB_SETTINGS")
+except RuntimeError as e:
+    app.logger.warning(e)
+## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
+app.config.from_prefixed_env()
+
+for key in sorted(app.config.keys()):
+    if "SECRET" not in key:
+        app.logger.info("{:30} = {}".format(key,app.config[key]))
+
+#######################################
+
+db = DBInterface(app.config["DB_STORE_PATH"],app.config["DB_DATA_URI_BASE"])
 
 app.register_blueprint(auth)
 login_manager = LoginManager()
@@ -25,17 +59,22 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     u = User(user_id)
-    u.uri = os.path.join(user_prefix,user_id)
+    u.uri = os.path.join(app.config["DB_USERS_URI_BASE"],user_id)
     return u
 
+if app.config["PROXY_FORWARDING"]:
+    app.logger.debug("Enabling ProxyFix WSGI Middleware")
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+    )
 
-app.config["SECRET_KEY"] = b"dummy"
-app.config["SESSION_PROTECTION"] = "strong"
-
+#######################################
 
 @app.route("/")
 @login_required
 def index():
+    app.logger.debug(request.headers)
+    app.logger.debug(request.host)
     status = None
     try:
         status = request.args["status"]
