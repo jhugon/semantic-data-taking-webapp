@@ -10,4 +10,4 @@ services:
     ports:
       - "8080:80"
     environment:
-      NGINX_HOSTNAME: localhost
+      NGINX_HOSTNAME: semweb.localhost

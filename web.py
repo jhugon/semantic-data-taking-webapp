@@ -1,20 +1,23 @@
 from flask import Flask
 from flask import request
 from flask import render_template, redirect, url_for
-from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, QUDT
-import urllib
-from datetime import datetime
-import os.path
-import logging
-
-logging.basicConfig(level=logging.DEBUG)
-
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
+
+from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, QUDT
 from flask_simple_login import (
     auth,
     User,
     login_required,
 )
+
+
+import urllib
+from datetime import datetime
+import os.path
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__)
 
@@ -22,7 +25,8 @@ app = Flask(__name__)
 
 app.config["DB_STORE_PATH"] = "web-db-store.bdb"
 app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
-#app.config["SERVER_NAME"] = "localhost" # doesn't seem to work with my proxy settings
+app.config["SERVER_NAME"] = "semweb.localhost"
+app.config["PROXY_FORWARDING"] = True
 
 app.config["SECRET_KEY"] = b"dummy"
 app.config["SESSION_PROTECTION"] = "strong"
@@ -46,6 +50,13 @@ def load_user(user_id):
     u.uri = os.path.join(user_prefix,user_id)
     return u
 
+if app.config["PROXY_FORWARDING"]:
+    app.logger.debug("Enabling ProxyFix WSGI Middleware")
+    app.wsgi_app = ProxyFix(
+        app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1
+    )
+
+#######################################
 
 @app.route("/")
 @login_required
