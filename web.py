@@ -5,6 +5,9 @@ from db import DBInterface, DataValidationError, GetSubjectError, user_prefix, Q
 import urllib
 from datetime import datetime
 import os.path
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 from flask_login import LoginManager, current_user
 from flask_simple_login import (
@@ -31,6 +34,10 @@ def load_user(user_id):
 
 app.config["SECRET_KEY"] = b"dummy"
 app.config["SESSION_PROTECTION"] = "strong"
+
+for key in sorted(app.config.keys()):
+    if "SECRET" not in key:
+        app.logger.info("{:30} = {}".format(key,app.config[key]))
 
 
 @app.route("/")

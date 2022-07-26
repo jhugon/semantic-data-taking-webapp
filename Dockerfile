@@ -4,16 +4,18 @@ FROM python:3.10
 WORKDIR /app
 COPY Pipfile .
 COPY Pipfile.lock .
-COPY db.py .
 COPY flask-simple-login flask-simple-login
-COPY ontology ontology
-COPY templates templates
-COPY web.py .
 
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
 RUN pipenv install
 RUN pipenv install gunicorn
+
+# Do this after pip so earlier steps can be cached by Docker
+COPY ontology ontology
+COPY templates templates
+COPY db.py .
+COPY web.py .
 
 EXPOSE 8000
 

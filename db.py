@@ -3,6 +3,9 @@ from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 from rdflib.store import NO_STORE, VALID_STORE
 import os.path
 import re
+import logging
+
+LOGGER = logging.getLogger(__name__)
 
 SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 QUDT = Namespace("http://qudt.org/schema/qudt/")
@@ -44,6 +47,8 @@ class DBStoreError(DBInterfaceError):
 
 class DBInterface:
     def __init__(self,store_path="web-db-store.bdb"):
+        store_path = os.path.abspath(store_path)
+        LOGGER.info(f"DB store at: {store_path}")
         self.store_path = store_path
         self.graph = self.load_graph(self.store_path)
         self.build_quantity_kind_list()
@@ -56,6 +61,7 @@ class DBInterface:
         graph = ConjunctiveGraph("BerkeleyDB")
         opencode = graph.open(store_path,create=False)
         if opencode == NO_STORE:
+            LOGGER.info(f"Store not initialized, initializing now...")
             graph.open(store_path,create=True)
             graph.parse("http://qudt.org/schema/qudt/")
             graph.parse("http://qudt.org/vocab/quantitykind/")
@@ -64,8 +70,10 @@ class DBInterface:
             graph.parse("ontology/units.ttl")
             graph.commit()
             graph.close()
+            LOGGER.info(f"Store initialized")
             return self.load_graph(store_path)
         elif opencode == VALID_STORE:
+            LOGGER.info(f"Successfully loaded already initialized store")
             return graph
         else:
             raise DBStoreError(f"Database store at 'store_path' is corrupted")
