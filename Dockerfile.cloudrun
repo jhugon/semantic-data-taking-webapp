@@ -6,6 +6,7 @@ COPY Pipfile .
 COPY Pipfile.lock .
 COPY flask-simple-login flask-simple-login
 RUN ls -l
+RUN ls -l flask-simple-login
 
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
