@@ -1,9 +1,12 @@
 steps:
-  - name: git
+  - id: git-submodule
+    name: 'gcr.io/cloud-builders/git'
+    entrypoint: 'bash'
+    env: ['GIT_DISCOVERY_ACROSS_FILESYSTEM=1']
     args:
-      - submodule
-      - init
-    id: GitSubmodules
+    - '-c'
+    - |
+      ls -la
   - name: gcr.io/cloud-builders/docker
     args:
       - build
