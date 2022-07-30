@@ -2,6 +2,14 @@
 
 This app is a Flask-based dynamic website that uses an RDF graph database to store data. Initially, the website is for manually entering data into HTML forms. The entered data can then be viewed in tables.
 
+## Run locally with Docker
+
+```bash
+docker compose up --build
+```
+
+The app should be visible at `http://semweb.localhost:8080`
+
 ## Run Test Server
 
 Set things up:
