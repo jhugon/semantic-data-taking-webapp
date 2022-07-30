@@ -1,4 +1,9 @@
 steps:
+  - name: git
+    args:
+      - submodule
+      - init
+    id: GitSubmodules
   - name: gcr.io/cloud-builders/docker
     args:
       - build
