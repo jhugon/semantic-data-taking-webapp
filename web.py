@@ -25,6 +25,7 @@ app = Flask(__name__)
 #### Configuration ###################
 
 app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+app.config["DB_STORE_TYPE"] = "BerkeleyDB"
 app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"
 app.config["DB_USERS_URI_BASE"] = os.path.join(app.config["DB_DATA_URI_BASE"],"users/")
 app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
@@ -52,7 +53,7 @@ for key in sorted(app.config.keys()):
 
 #######################################
 
-db = DBInterface(app.config["DB_STORE_PATH"],app.config["DB_DATA_URI_BASE"])
+db = DBInterface(store_path=app.config["DB_STORE_PATH"],data_prefix=app.config["DB_DATA_URI_BASE"],store_type=app.config["DB_STORE_TYPE"])
 
 app.register_blueprint(auth)
 login_manager = LoginManager()

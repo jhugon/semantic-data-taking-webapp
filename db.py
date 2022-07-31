@@ -312,6 +312,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", required=True,
                         help="Directory name to initialize DB to")
+    parser.add_argument("--type", default="BerkeleyDB", choices=["BerkelyDB","SPARQLUpdateStore"],
+                        help="Type of database backend")
     args = parser.parse_args()
 
-    DBInterface.initialize_store(args.init)
+    DBInterface.initialize_store(args.init,args.type)
