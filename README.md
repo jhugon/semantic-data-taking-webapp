@@ -25,6 +25,12 @@ Create a user:
 flask-simple-login-gen-user-file-line > userfile.txt
 ```
 
+Initialize the database:
+
+```bash
+python db.py --init web-db-store.bdb
+```
+
 Run the server:
 
 ```bash

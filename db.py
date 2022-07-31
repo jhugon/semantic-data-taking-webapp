@@ -4,6 +4,7 @@ from rdflib.store import NO_STORE, VALID_STORE
 import os.path
 import re
 import logging
+import berkeleydb
 
 LOGGER = logging.getLogger(__name__)
 
@@ -42,10 +43,24 @@ class DBStoreError(DBInterfaceError):
     pass
 
 class DBInterface:
-    def __init__(self,store_path="web-db-store.bdb",data_prefix="http://data-webapp.hugonlabs.com/test1/"):
+
+    @staticmethod
+    def initialize_store(store_path, store_type="BerkeleyDB"):
+        graph = ConjunctiveGraph(store_type)
+        graph.open(store_path,create=True)
+        graph.parse("http://qudt.org/schema/qudt/")
+        graph.parse("http://qudt.org/vocab/quantitykind/")
+        graph.parse("http://qudt.org/vocab/unit/")
+        graph.parse("ontology/sdtw.ttl")
+        graph.parse("ontology/units.ttl")
+        graph.commit()
+        graph.close()
+
+    def __init__(self,store_path="web-db-store.bdb",data_prefix="http://data-webapp.hugonlabs.com/test1/",store_type="BerkeleyDB"):
         store_path = os.path.abspath(store_path)
         LOGGER.info(f"DB store at: {store_path}")
         self.store_path = store_path
+        self.store_type = store_type
         self.graph = self.load_graph(self.store_path)
         self.build_quantity_kind_list()
         #self.graph.serialize(destination="debug.ttl")
@@ -60,25 +75,22 @@ class DBInterface:
             pass
 
     def load_graph(self,store_path):
-        graph = ConjunctiveGraph("BerkeleyDB")
-        opencode = graph.open(store_path,create=False)
-        if opencode == NO_STORE:
-            LOGGER.info(f"Store not initialized, initializing now...")
-            graph.open(store_path,create=True)
-            graph.parse("http://qudt.org/schema/qudt/")
-            graph.parse("http://qudt.org/vocab/quantitykind/")
-            graph.parse("http://qudt.org/vocab/unit/")
-            graph.parse("ontology/sdtw.ttl")
-            graph.parse("ontology/units.ttl")
-            graph.commit()
-            graph.close()
-            LOGGER.info(f"Store initialized")
-            return self.load_graph(store_path)
-        elif opencode == VALID_STORE:
-            LOGGER.info(f"Successfully loaded already initialized store")
-            return graph
+        graph = ConjunctiveGraph(self.store_type)
+        try:
+            opencode = graph.open(store_path,create=False)
+        except berkeleydb.db.DBNoSuchFileError:
+            LOGGER.error(f"Database store {store_path} doesn't exist")
+            raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
         else:
-            raise DBStoreError(f"Database store at 'store_path' is corrupted")
+            if opencode == NO_STORE:
+                LOGGER.error(f"Database store {store_path} not initialized")
+                raise DBStoreError(f"Database store at '{store_path}' not initialized")
+            elif opencode == VALID_STORE:
+                LOGGER.info(f"Successfully loaded already initialized store")
+                return graph
+            else:
+                LOGGER.error(f"Database store {store_path} is corrupted")
+                raise DBStoreError(f"Database store at 'store_path' is corrupted")
 
     def convertToURIRef(self,x):
         """
@@ -294,17 +306,12 @@ class DBInterface:
 
 
 if __name__ == "__main__":
-    db = DBInterface()
-    #db.addNewFeature("joke1","nock, nock: who's there?")
-    ##db.addNewFeature("car1","bad car")
-    #db.addNewObservableProperty("I1","Current through R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
-    #db.addNewObservableProperty("L1","Length of R1","http://data-webapp.hugonlabs.com/test1/features/joke1","http://qudt.org/vocab/quantitykind/Length","http://qudt.org/vocab/unit/M")
-    ##db.addNewObservableProperty("odometer","Odometer reading","http://data-webapp.hugonlabs.com/test1/features/car1","http://qudt.org/vocab/quantitykind/ElectricCurrent","http://qudt.org/vocab/unit/A")
-    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T00:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.2','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.05'})
-    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T11:11:11Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1','http://data-webapp.hugonlabs.com/test1/properties/joke1/l1':'0.06'})
-    #db.enterData("http://data-webapp.hugonlabs.com/test1/features/joke1","2022-01-01T18:00:00Z","http://data-webapp.hugonlabs.com/test1/users/jhugon","Test data points",{'http://data-webapp.hugonlabs.com/test1/properties/joke1/i1':'0.1'})
-    for feature in db.listFeatures():
-        print(feature,db.getLabel(feature),db.getComment(feature))
-        print(db.getColumnHeadings(feature))
-        print(db.getData(feature))
-        print()
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--init", required=True,
+                        help="Directory name to initialize DB to")
+    args = parser.parse_args()
+
+    DBInterface.initialize_store(args.init)

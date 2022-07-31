@@ -42,6 +42,10 @@ except RuntimeError as e:
 ## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
 app.config.from_prefixed_env()
 
+## Options if using built-in Flask debugging server
+if "RUN_FROM_CLI" in app.config and app.config["RUN_FROM_CLI"]:
+    app.config["SERVER_NAME"] = app.config["SERVER_NAME"] +":5000"
+
 for key in sorted(app.config.keys()):
     if "SECRET" not in key:
         app.logger.info("{:30} = {}".format(key,app.config[key]))
