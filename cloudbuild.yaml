@@ -7,7 +7,7 @@ steps:
     - '-c'
     - |
       git init
-      git config -f .gitmodules submodule.flask-simple-login.url https://source.cloud.google.com/semweb-testing/github_jhugon_flask-simple-login/+/main
+      git config -f .gitmodules submodule.flask-simple-login.url https://source.developers.google.com/p/semweb-testing/r/github_jhugon_flask-simple-login
       git submodule init
       git submodule update
   - name: gcr.io/cloud-builders/docker
