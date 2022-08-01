@@ -11,3 +11,10 @@ services:
       - "8080:80"
     environment:
       NGINX_HOSTNAME: semweb.localhost
+  db-server:
+    build: ./jena-fuseki
+    ports:
+      - "3030:3030"
+    volumes:
+      - ./jenadb/:/app/db
+    #command: ["./apache-jena-fuseki-4.5.0/fuseki-server","--help"]
