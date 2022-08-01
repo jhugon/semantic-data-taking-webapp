@@ -1,6 +1,7 @@
 from rdflib import ConjunctiveGraph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 from rdflib.store import NO_STORE, VALID_STORE
+from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore, _node_to_sparql
 import os.path
 import re
 import logging
@@ -24,6 +25,11 @@ where {
     ?qk rdfs:label ?qk_name .
 }"""
 
+def my_bnode_ext(node):
+   if isinstance(node, BNode):
+       return '<bnode:b%s>' % node
+   return _node_to_sparql(node)
+
 class DBInterfaceError(Exception):
     pass
 
@@ -46,14 +52,33 @@ class DBInterface:
 
     @staticmethod
     def initialize_store(store_path, store_type="BerkeleyDB"):
-        graph = ConjunctiveGraph(store_type)
-        graph.open(store_path,create=True)
+        graph = None
+        store = None
+        if store_type == "SPARQLUpdateStore":
+            store = SPARQLUpdateStore(node_to_sparql=my_bnode_ext)
+            graph = ConjunctiveGraph(store)
+            graph.open(store_path,create=False)
+        elif store_type == "BerkeleyDB":
+            graph = ConjunctiveGraph(store_type)
+            graph.open(store_path,create=True)
+        else:
+            raise ValueError(f"DB Store type '{store_type}' not recognized")
+        LOGGER.info(f"Connected to DB")
         graph.parse("http://qudt.org/schema/qudt/")
+        graph.commit()
+        LOGGER.info(f"QUDT schema committed to DB")
         graph.parse("http://qudt.org/vocab/quantitykind/")
+        graph.commit()
+        LOGGER.info(f"QUDT quantity kind schema committed to DB")
         graph.parse("http://qudt.org/vocab/unit/")
+        graph.commit()
+        LOGGER.info(f"QUDT unit vocab committed to DB")
         graph.parse("ontology/sdtw.ttl")
+        graph.commit()
+        LOGGER.info(f"SDTW vocab committed to DB")
         graph.parse("ontology/units.ttl")
         graph.commit()
+        LOGGER.info(f"SDTW units vocab committed to DB")
         graph.close()
 
     def __init__(self,store_path="web-db-store.bdb",data_prefix="http://data-webapp.hugonlabs.com/test1/",store_type="BerkeleyDB"):
@@ -308,7 +333,7 @@ class DBInterface:
 if __name__ == "__main__":
     import argparse
     import sys
-
+    
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", required=True,
                         help="Directory name to initialize DB to")
@@ -316,4 +341,5 @@ if __name__ == "__main__":
                         help="Type of database backend")
     args = parser.parse_args()
 
+    LOGGER.setLevel(logging.INFO)
     DBInterface.initialize_store(args.init,args.type)
