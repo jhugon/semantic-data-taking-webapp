@@ -81,17 +81,23 @@ class DBInterface:
         LOGGER.info(f"SDTW units vocab committed to DB")
         graph.close()
 
-    def __init__(self,store_path="web-db-store.bdb",data_prefix="http://data-webapp.hugonlabs.com/test1/",store_type="BerkeleyDB"):
-        store_path = os.path.abspath(store_path)
-        LOGGER.info(f"DB store at: {store_path}")
+    def __init__(self,store_path="web-db-store.bdb",data_uri_base="http://data-webapp.hugonlabs.com/test1/",store_type="BerkeleyDB"):
+        if store_type == "BerkeleyDB":
+            store_path = os.path.abspath(store_path)
         self.store_path = store_path
         self.store_type = store_type
+        self.data_uri_base = data_uri_base
+        self.store = None
+
+        LOGGER.info(f"DB store at: {self.store_path}")
+        LOGGER.info(f"DB store type: {self.store_type}")
+        LOGGER.info(f"DB data URI base: {self.data_uri_base}")
+
         self.graph = self.load_graph(self.store_path)
-        self.build_quantity_kind_list()
+        #self.build_quantity_kind_list()
         #self.graph.serialize(destination="debug.ttl")
 
         self.SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
-        self.data_prefix = data_prefix
 
     def __del__(self):
         try:
@@ -100,22 +106,30 @@ class DBInterface:
             pass
 
     def load_graph(self,store_path):
-        graph = ConjunctiveGraph(self.store_type)
-        try:
-            opencode = graph.open(store_path,create=False)
-        except berkeleydb.db.DBNoSuchFileError:
-            LOGGER.error(f"Database store {store_path} doesn't exist")
-            raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
-        else:
-            if opencode == NO_STORE:
-                LOGGER.error(f"Database store {store_path} not initialized")
-                raise DBStoreError(f"Database store at '{store_path}' not initialized")
-            elif opencode == VALID_STORE:
-                LOGGER.info(f"Successfully loaded already initialized store")
-                return graph
+        graph = None
+        if self.store_type == "BerkeleyDB":
+            graph = ConjunctiveGraph(self.store_type,identifier=self.data_uri_base)
+            try:
+                opencode = graph.open(store_path,create=False)
+            except berkeleydb.db.DBNoSuchFileError:
+                LOGGER.error(f"Database store {store_path} doesn't exist")
+                raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
             else:
-                LOGGER.error(f"Database store {store_path} is corrupted")
-                raise DBStoreError(f"Database store at 'store_path' is corrupted")
+                if opencode == NO_STORE:
+                    LOGGER.error(f"Database store {store_path} not initialized")
+                    raise DBStoreError(f"Database store at '{store_path}' not initialized")
+                elif opencode == VALID_STORE:
+                    LOGGER.info(f"Successfully loaded store")
+                    return graph
+                else:
+                    LOGGER.error(f"Database store {store_path} is corrupted")
+                    raise DBStoreError(f"Database store at '{store_path}' is corrupted")
+        elif self.store_type == "SPARQLUpdateStore":
+            store = SPARQLUpdateStore(query_endpoint=self.store_path,update_endpoint=self.store_path,node_to_sparql=my_bnode_ext)
+            graph = ConjunctiveGraph(store,identifier=self.data_uri_base)
+            return graph
+        else:
+            raise ValueError(f"store_type: '{self.store_type}' not allowed")
 
     def convertToURIRef(self,x):
         """
@@ -177,7 +191,7 @@ class DBInterface:
     def addNewFeature(self,label,comment):
         if not re.match(r"^\w+$",label):
             raise DataValidationError("Feature label must be more than one letter, number, or _")
-        featureURI = os.path.join(self.data_prefix,"features",label.lower())
+        featureURI = os.path.join(self.data_uri_base,"features",label.lower())
         feature = URIRef(featureURI)
         if (feature,None,None) in self.graph:
             raise FeatureAlreadyExistsError(f"Feature with label '{label}' is already in graph")
@@ -196,7 +210,7 @@ class DBInterface:
         featureName = self.getLabel(feature)
         if not re.match(r"^\w+$",label):
             raise DataValidationError("Property label must be more than one letter, number, or _")
-        propURI = os.path.join(self.data_prefix,"properties",featureName.lower(),label.lower())
+        propURI = os.path.join(self.data_uri_base,"properties",featureName.lower(),label.lower())
         prop = URIRef(propURI)
         if (prop,None,None) in self.graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
@@ -269,7 +283,7 @@ class DBInterface:
         sensor = self.convertToURIRef(sensor)
         featureName = self.getLabel(feature)
         props = list(self.listObservableProperties(feature))
-        stimulusURI = os.path.join(self.data_prefix,"stimuli",featureName.lower(),t.upper())
+        stimulusURI = os.path.join(self.data_uri_base,"stimuli",featureName.lower(),t.upper())
         stimulus = self.convertToURIRef(stimulusURI)
         self.graph.add((stimulus,RDF.type,SSN.Stimulus))
         self.graph.set((stimulus,RDFS.comment,Literal(comment)))
@@ -291,7 +305,7 @@ class DBInterface:
                 raise DataValidationError(e)
             unit = self.graph.value(prop,self.SDTW.hasUnit)
             propName = self.getLabel(prop)
-            observationURI = os.path.join(self.data_prefix,"observations",featureName,propName,t)
+            observationURI = os.path.join(self.data_uri_base,"observations",featureName,propName,t)
             observation = self.convertToURIRef(observationURI)
             self.graph.add((stimulus,SSN.isProxyFor,prop))
             self.graph.add((observation,RDF.type,SOSA.Observation))
