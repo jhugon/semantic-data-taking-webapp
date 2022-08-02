@@ -333,6 +333,8 @@ class DBInterface:
 if __name__ == "__main__":
     import argparse
     import sys
+
+    logging.basicConfig(level=logging.INFO)
     
     parser = argparse.ArgumentParser()
     parser.add_argument("--init", required=True,
@@ -341,5 +343,4 @@ if __name__ == "__main__":
                         help="Type of database backend")
     args = parser.parse_args()
 
-    LOGGER.setLevel(logging.INFO)
     DBInterface.initialize_store(args.init,args.type)
