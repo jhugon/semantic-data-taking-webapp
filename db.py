@@ -50,37 +50,6 @@ class DBStoreError(DBInterfaceError):
 
 class DBInterface:
 
-    @staticmethod
-    def initialize_store(store_path, store_type="BerkeleyDB"):
-        graph = None
-        store = None
-        if store_type == "SPARQLUpdateStore":
-            store = SPARQLUpdateStore(node_to_sparql=my_bnode_ext)
-            graph = ConjunctiveGraph(store)
-            graph.open(store_path,create=False)
-        elif store_type == "BerkeleyDB":
-            graph = ConjunctiveGraph(store_type)
-            graph.open(store_path,create=True)
-        else:
-            raise ValueError(f"DB Store type '{store_type}' not recognized")
-        LOGGER.info(f"Connected to DB")
-        graph.parse("http://qudt.org/schema/qudt/")
-        graph.commit()
-        LOGGER.info(f"QUDT schema committed to DB")
-        graph.parse("http://qudt.org/vocab/quantitykind/")
-        graph.commit()
-        LOGGER.info(f"QUDT quantity kind schema committed to DB")
-        graph.parse("http://qudt.org/vocab/unit/")
-        graph.commit()
-        LOGGER.info(f"QUDT unit vocab committed to DB")
-        graph.parse("ontology/sdtw.ttl")
-        graph.commit()
-        LOGGER.info(f"SDTW vocab committed to DB")
-        graph.parse("ontology/units.ttl")
-        graph.commit()
-        LOGGER.info(f"SDTW units vocab committed to DB")
-        graph.close()
-
     def __init__(self,store_path="web-db-store.bdb",data_uri_base="http://data-webapp.hugonlabs.com/test1/",store_type="BerkeleyDB"):
         if store_type == "BerkeleyDB":
             store_path = os.path.abspath(store_path)
@@ -143,10 +112,12 @@ class DBInterface:
         else:
             return URIRef(x)
 
-    def getLabel(self,x):
+    def getLabel(self,x,graph_name=None):
+        if graph_name is None:
+            graph_name = self.data_uri_base
         x = self.convertToURIRef(x)
         labels_set = set()
-        for label in self.dataset.objects(x,RDFS.label):
+        for label in self.dataset.graph(graph_name).objects(x,RDFS.label):
             labels_set.add(label)
         labels = list(labels_set)
         if len(labels) == 0:
@@ -163,16 +134,19 @@ class DBInterface:
                 return labels[label_langs.index("en")].value
             return labels[0].value
 
-    def getSubjectLabeledWithType(self,label,typ,label_lang=None):
+    def getSubjectLabeledWithType(self,label,typ,label_lang=None,graph_name=None):
+        if graph_name is None:
+            graph_name = self.data_uri_base
+        graph = self.dataset.graph(graph_name)
         label2 = Literal(label,lang=label_lang)
-        print(f"label2: {label2}")
-        subjects = list(self.dataset.subjects(RDFS.label,label2))
-        print(f"subjects: {subjects}")
+        LOGGER.debug(f"label2: {label2}")
+        subjects = list(graph.subjects(RDFS.label,label2))
+        LOGGER.debug(f"subjects: {subjects}")
         if len(subjects) < 1:
             raise GetSubjectError(f"No subject with label '{label}'")
         matching_subjects = set()
         for subject in subjects:
-            if (subject,RDF.type,typ) in self.dataset:
+            if (subject,RDF.type,typ) in graph:
                 matching_subjects.add(subject)
         if len(matching_subjects) == 0:
             raise GetSubjectError(f"No subject with label '{label}' has type '{typ}'")
@@ -180,15 +154,19 @@ class DBInterface:
             raise GetSubjectError(f"Multiple subjects with label '{label}' and type '{typ}'")
         return subjects[0]
 
-    def getComment(self,x):
+    def getComment(self,x,graph_name=None):
+        if graph_name is None:
+            graph_name = self.data_uri_base
         x = self.convertToURIRef(x)
-        return self.dataset.value(x,RDFS.comment).value
+        return self.dataset.graph(graph_name).value(x,RDFS.comment).value
 
-    def getListLabels(self,l):
-        return [self.getLabel(x) for x in l]
+    def getListLabels(self,l,graph_name=None):
+        return [self.getLabel(x,graph_name=graph_name) for x in l]
 
-    def listFeatures(self):
-        return self.dataset.subjects(RDF.type, SOSA.FeatureOfInterest)
+    def listFeatures(self,graph_name=None):
+        if graph_name is None:
+            graph_name = self.data_uri_base
+        return self.dataset.graph(graph_name).subjects(RDF.type, SOSA.FeatureOfInterest)
 
     def addNewFeature(self,label,comment):
         if not re.match(r"^\w+$",label):
@@ -344,6 +322,38 @@ class DBInterface:
             results.append((str(unit),label))
         results.sort(key=lambda x: x[1])
         return results
+
+    @staticmethod
+    def initialize_store(store_path, store_type="BerkeleyDB"):
+        graph = None
+        store = None
+        if store_type == "SPARQLUpdateStore":
+            store = SPARQLUpdateStore(node_to_sparql=my_bnode_ext)
+            graph = ConjunctiveGraph(store)
+            graph.open(store_path,create=False)
+        elif store_type == "BerkeleyDB":
+            graph = ConjunctiveGraph(store_type)
+            graph.open(store_path,create=True)
+        else:
+            raise ValueError(f"DB Store type '{store_type}' not recognized")
+        LOGGER.info(f"Connected to DB")
+        graph.parse("http://qudt.org/schema/qudt/")
+        graph.commit()
+        LOGGER.info(f"QUDT schema committed to DB")
+        graph.parse("http://qudt.org/vocab/quantitykind/")
+        graph.commit()
+        LOGGER.info(f"QUDT quantity kind schema committed to DB")
+        graph.parse("http://qudt.org/vocab/unit/")
+        graph.commit()
+        LOGGER.info(f"QUDT unit vocab committed to DB")
+        graph.parse("ontology/sdtw.ttl")
+        graph.commit()
+        LOGGER.info(f"SDTW vocab committed to DB")
+        graph.parse("ontology/units.ttl")
+        graph.commit()
+        LOGGER.info(f"SDTW units vocab committed to DB")
+        graph.close()
+
 
 
 if __name__ == "__main__":
