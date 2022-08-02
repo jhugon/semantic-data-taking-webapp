@@ -1,4 +1,4 @@
-from rdflib import ConjunctiveGraph, Namespace, URIRef, BNode, Literal
+from rdflib import Dataset, ConjunctiveGraph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 from rdflib.store import NO_STORE, VALID_STORE
 from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore, _node_to_sparql
@@ -88,29 +88,31 @@ class DBInterface:
         self.store_type = store_type
         self.data_uri_base = data_uri_base
         self.store = None
+        self.dataset = None
 
         LOGGER.info(f"DB store at: {self.store_path}")
         LOGGER.info(f"DB store type: {self.store_type}")
         LOGGER.info(f"DB data URI base: {self.data_uri_base}")
 
-        self.graph = self.load_graph(self.store_path)
+        self.dataset = self.load_dataset(self.store_path,self.store_type)
+        self.data_graph = self.dataset.graph(self.data_uri_base)
         #self.build_quantity_kind_list()
-        #self.graph.serialize(destination="debug.ttl")
+        #self.data_graph.serialize(destination="debug.ttl")
 
         self.SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 
     def __del__(self):
         try:
-            self.graph.close()
+            self.dataset.close()
         except Exception:
             pass
 
-    def load_graph(self,store_path):
-        graph = None
+    def load_dataset(self,store_path,store_type):
+        dataset = None
         if self.store_type == "BerkeleyDB":
-            graph = ConjunctiveGraph(self.store_type,identifier=self.data_uri_base)
+            dataset = Dataset(self.store_type)
             try:
-                opencode = graph.open(store_path,create=False)
+                opencode = dataset.open(store_path,create=False)
             except berkeleydb.db.DBNoSuchFileError:
                 LOGGER.error(f"Database store {store_path} doesn't exist")
                 raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
@@ -120,14 +122,14 @@ class DBInterface:
                     raise DBStoreError(f"Database store at '{store_path}' not initialized")
                 elif opencode == VALID_STORE:
                     LOGGER.info(f"Successfully loaded store")
-                    return graph
+                    return dataset
                 else:
                     LOGGER.error(f"Database store {store_path} is corrupted")
                     raise DBStoreError(f"Database store at '{store_path}' is corrupted")
-        elif self.store_type == "SPARQLUpdateStore":
+        elif store_type == "SPARQLUpdateStore":
             store = SPARQLUpdateStore(query_endpoint=self.store_path,update_endpoint=self.store_path,node_to_sparql=my_bnode_ext)
-            graph = ConjunctiveGraph(store,identifier=self.data_uri_base)
-            return graph
+            dataset = Dataset(store)
+            return dataset
         else:
             raise ValueError(f"store_type: '{self.store_type}' not allowed")
 
@@ -144,7 +146,7 @@ class DBInterface:
     def getLabel(self,x):
         x = self.convertToURIRef(x)
         labels_set = set()
-        for label in self.graph.objects(x,RDFS.label):
+        for label in self.dataset.objects(x,RDFS.label):
             labels_set.add(label)
         labels = list(labels_set)
         if len(labels) == 0:
@@ -164,13 +166,13 @@ class DBInterface:
     def getSubjectLabeledWithType(self,label,typ,label_lang=None):
         label2 = Literal(label,lang=label_lang)
         print(f"label2: {label2}")
-        subjects = list(self.graph.subjects(RDFS.label,label2))
+        subjects = list(self.dataset.subjects(RDFS.label,label2))
         print(f"subjects: {subjects}")
         if len(subjects) < 1:
             raise GetSubjectError(f"No subject with label '{label}'")
         matching_subjects = set()
         for subject in subjects:
-            if (subject,RDF.type,typ) in self.graph:
+            if (subject,RDF.type,typ) in self.dataset:
                 matching_subjects.add(subject)
         if len(matching_subjects) == 0:
             raise GetSubjectError(f"No subject with label '{label}' has type '{typ}'")
@@ -180,29 +182,29 @@ class DBInterface:
 
     def getComment(self,x):
         x = self.convertToURIRef(x)
-        return self.graph.value(x,RDFS.comment).value
+        return self.dataset.value(x,RDFS.comment).value
 
     def getListLabels(self,l):
         return [self.getLabel(x) for x in l]
 
     def listFeatures(self):
-        return self.graph.subjects(RDF.type, SOSA.FeatureOfInterest)
+        return self.dataset.subjects(RDF.type, SOSA.FeatureOfInterest)
 
     def addNewFeature(self,label,comment):
         if not re.match(r"^\w+$",label):
             raise DataValidationError("Feature label must be more than one letter, number, or _")
         featureURI = os.path.join(self.data_uri_base,"features",label.lower())
         feature = URIRef(featureURI)
-        if (feature,None,None) in self.graph:
+        if (feature,None,None) in self.data_graph:
             raise FeatureAlreadyExistsError(f"Feature with label '{label}' is already in graph")
-        self.graph.add((feature,RDF.type,SOSA.FeatureOfInterest))
-        self.graph.set((feature,RDFS.label,Literal(label)))
-        self.graph.set((feature,RDFS.comment,Literal(comment)))
-        self.graph.commit()
+        self.data_graph.add((feature,RDF.type,SOSA.FeatureOfInterest))
+        self.data_graph.set((feature,RDFS.label,Literal(label)))
+        self.data_graph.set((feature,RDFS.comment,Literal(comment)))
+        self.data_graph.commit()
 
     def listObservableProperties(self,featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
-        props = sorted(self.graph.subjects(SSN.isPropertyOf,featureOfInterest),key=lambda x: self.graph.value(x,RDFS.label).value)
+        props = sorted(self.data_graph.subjects(SSN.isPropertyOf,featureOfInterest),key=lambda x: self.data_graph.value(x,RDFS.label).value)
         return props
 
     def addNewObservableProperty(self,label,comment,feature,quantityKind,unit):
@@ -212,29 +214,29 @@ class DBInterface:
             raise DataValidationError("Property label must be more than one letter, number, or _")
         propURI = os.path.join(self.data_uri_base,"properties",featureName.lower(),label.lower())
         prop = URIRef(propURI)
-        if (prop,None,None) in self.graph:
+        if (prop,None,None) in self.data_graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
         quantityKind = self.convertToURIRef(quantityKind)
-        if (quantityKind,RDF.type,QUDT.QuantityKind) not in self.graph:
+        if (quantityKind,RDF.type,QUDT.QuantityKind) not in self.data_graph:
             raise DataValidationError(r"Quantity kind not found in database")
         unit = self.convertToURIRef(unit)
-        if (unit,RDF.type,QUDT.Unit) not in self.graph:
+        if (unit,RDF.type,QUDT.Unit) not in self.data_graph:
             raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
-        self.graph.add((prop,RDF.type,SOSA.ObservableProperty))
-        self.graph.set((prop,RDFS.label,label))
-        self.graph.set((prop,RDFS.comment,comment))
-        self.graph.set((prop,SSN.isPropertyOf,feature))
-        self.graph.set((prop,self.SDTW.hasQuantityKind,quantityKind))
-        self.graph.set((prop,self.SDTW.hasUnit,unit))
-        self.graph.commit()
+        self.data_graph.add((prop,RDF.type,SOSA.ObservableProperty))
+        self.data_graph.set((prop,RDFS.label,label))
+        self.data_graph.set((prop,RDFS.comment,comment))
+        self.data_graph.set((prop,SSN.isPropertyOf,feature))
+        self.data_graph.set((prop,self.SDTW.hasQuantityKind,quantityKind))
+        self.data_graph.set((prop,self.SDTW.hasUnit,unit))
+        self.data_graph.commit()
 
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         label = self.getLabel(observedProperty)
-        unit = self.graph.value(observedProperty,self.SDTW.hasUnit)
-        unit_label = self.graph.value(unit,QUDT.symbol)
+        unit = self.data_graph.value(observedProperty,self.SDTW.hasUnit)
+        unit_label = self.data_graph.value(unit,QUDT.symbol)
         result = f"{label} [{unit_label}]"
         return result
 
@@ -249,21 +251,21 @@ class DBInterface:
         props = list(self.listObservableProperties(featureOfInterest))
         stimuli = set()
         for prop in props:
-            for stimulus in self.graph.subjects(SSN.isProxyFor,prop):
+            for stimulus in self.data_graph.subjects(SSN.isProxyFor,prop):
                 stimuli.add(stimulus)
-        stimuli = sorted(list(stimuli),key=lambda t: self.graph.value(t,self.SDTW.hasTime).value)
-        stim_times = [self.graph.value(stimulus,self.SDTW.hasTime).value for stimulus in stimuli]
+        stimuli = sorted(list(stimuli),key=lambda t: self.data_graph.value(t,self.SDTW.hasTime).value)
+        stim_times = [self.data_graph.value(stimulus,self.SDTW.hasTime).value for stimulus in stimuli]
         data = []
         for stimulus in stimuli:
             stim_data = []
-            observations = list(self.graph.subjects(SSN.wasOriginatedBy,stimulus))
+            observations = list(self.data_graph.subjects(SSN.wasOriginatedBy,stimulus))
             for prop in props:
                 val = None
                 for observation in observations:
-                    if (observation,SOSA.observedProperty,prop) in self.graph:
+                    if (observation,SOSA.observedProperty,prop) in self.data_graph:
                         if val is None:
-                            res = self.graph.value(observation,SOSA.hasResult)
-                            val = self.graph.value(res,QUDT.value).value
+                            res = self.data_graph.value(observation,SOSA.hasResult)
+                            val = self.data_graph.value(res,QUDT.value).value
                         else:
                             print(f"Warning: {stimulus} {prop} has more than one observation!")
                 stim_data.append(val)
@@ -285,9 +287,9 @@ class DBInterface:
         props = list(self.listObservableProperties(feature))
         stimulusURI = os.path.join(self.data_uri_base,"stimuli",featureName.lower(),t.upper())
         stimulus = self.convertToURIRef(stimulusURI)
-        self.graph.add((stimulus,RDF.type,SSN.Stimulus))
-        self.graph.set((stimulus,RDFS.comment,Literal(comment)))
-        self.graph.set((stimulus,self.SDTW.hasTime,Literal(t,datatype=XSD.dateTime)))
+        self.data_graph.add((stimulus,RDF.type,SSN.Stimulus))
+        self.data_graph.set((stimulus,RDFS.comment,Literal(comment)))
+        self.data_graph.set((stimulus,self.SDTW.hasTime,Literal(t,datatype=XSD.dateTime)))
         for prop in props:
             prop = self.convertToURIRef(prop)
             datum = None
@@ -303,25 +305,25 @@ class DBInterface:
                 raise DataValidationError(e)
             except TypeError as e:
                 raise DataValidationError(e)
-            unit = self.graph.value(prop,self.SDTW.hasUnit)
+            unit = self.data_graph.value(prop,self.SDTW.hasUnit)
             propName = self.getLabel(prop)
             observationURI = os.path.join(self.data_uri_base,"observations",featureName,propName,t)
             observation = self.convertToURIRef(observationURI)
-            self.graph.add((stimulus,SSN.isProxyFor,prop))
-            self.graph.add((observation,RDF.type,SOSA.Observation))
-            self.graph.set((observation,RDFS.comment,Literal(comment)))
-            self.graph.set((observation,SOSA.madeBySensor,sensor))
-            self.graph.set((observation,SSN.wasOriginatedBy,stimulus))
-            self.graph.set((observation,SOSA.hasFeatureOfInterest,feature))
-            self.graph.set((observation,SOSA.observedProperty,prop))
-            self.graph.set((observation,SOSA.resultTime,Literal(t,datatype=XSD.dateTime)))
+            self.data_graph.add((stimulus,SSN.isProxyFor,prop))
+            self.data_graph.add((observation,RDF.type,SOSA.Observation))
+            self.data_graph.set((observation,RDFS.comment,Literal(comment)))
+            self.data_graph.set((observation,SOSA.madeBySensor,sensor))
+            self.data_graph.set((observation,SSN.wasOriginatedBy,stimulus))
+            self.data_graph.set((observation,SOSA.hasFeatureOfInterest,feature))
+            self.data_graph.set((observation,SOSA.observedProperty,prop))
+            self.data_graph.set((observation,SOSA.resultTime,Literal(t,datatype=XSD.dateTime)))
             res = BNode()
-            self.graph.set((observation,SOSA.hasResult,res))
-            self.graph.set((res,RDF.type,SOSA.Result))
-            self.graph.set((res,RDF.type,QUDT.Quantity))
-            self.graph.set((res,QUDT.value,Literal(datum)))
-            self.graph.set((res,QUDT.unit,unit))
-        self.graph.commit()
+            self.data_graph.set((observation,SOSA.hasResult,res))
+            self.data_graph.set((res,RDF.type,SOSA.Result))
+            self.data_graph.set((res,RDF.type,QUDT.Quantity))
+            self.data_graph.set((res,QUDT.value,Literal(datum)))
+            self.data_graph.set((res,QUDT.unit,unit))
+        self.data_graph.commit()
 
     def get_quantity_kind_list(self):
         return self.quantity_kind_and_label_list
