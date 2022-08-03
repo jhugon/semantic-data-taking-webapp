@@ -88,17 +88,32 @@ class DBInterface:
         else:
             return URIRef(x)
 
+    def triples(self,quad_or_triple):
+        if len(quad_or_triple) == 3 or (len(quad_or_triple) == 4 and quad_or_triple[3] is None):
+            return self.dataset.triples((quad_or_triple[0],quad_or_triple[1],quad_or_triple[2],None))
+        elif len(quad_or_triple) == 4:
+            graph_name = quad_or_triple[3]
+            return self.dataset.graph(graph_name).triples(quad_or_triple[:3])
+        else:
+            raise ValueError(f"argument quad_or_triple: '{quad_or_triple}' should be a 3 or 4 tuple")
+
+    def quads(self,quad_or_triple):
+        if len(quad_or_triple) == 3 or (len(quad_or_triple) == 4 and quad_or_triple[3] is None):
+            return self.dataset.quads((x,RDFS.label,None,None))
+        elif len(quad_or_triple) == 4:
+            graph_name = quad_or_triple[3]
+            triples = self.dataset.graph(graph_name).triples(quad_or_triple[:3])
+            return [(tr[0],tr[1],tr[2],graph_name) for tr in triples]
+        else:
+            raise ValueError(f"argument quad_or_triple: '{quad_or_triple}' should be a 3 or 4 tuple")
+
     def getLabel(self,x,graph_name=None):
         x = self.convertToURIRef(x)
         labels_set = set()
         LOGGER.debug(f"subject: {x}, type: {type(x)}")
         LOGGER.debug(f"graph_name: {graph_name}, type: {type(graph_name)}")
-        if graph_name is None:
-            for s,p,label,c in self.dataset.quads((x,RDFS.label,None,None)):
-                labels_set.add(label)
-        else:
-            for s,p,label in self.dataset.graph(graph_name).triples((x,RDFS.label,None)):
-                labels_set.add(label)
+        for s,p,label in self.dataset.triples((x,RDFS.label,None)):
+            labels_set.add(label)
         LOGGER.debug(f"labels_set: {labels_set}")
         labels = list(labels_set)
         if len(labels) == 0:
