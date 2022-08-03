@@ -104,7 +104,6 @@ class DBInterface:
             for graph in self.dataset.graphs():
                 for tr in graph.triples(quad_or_triple[:3]):
                     yield (tr[0],tr[1],tr[2],graph.identifier)
-            return self.dataset.quads((x,RDFS.label,None,None))
         elif len(quad_or_triple) == 4:
             graph_name = quad_or_triple[3]
             for tr in self.dataset.graph(graph_name).triples(quad_or_triple[:3]):
@@ -117,7 +116,7 @@ class DBInterface:
         labels_set = set()
         LOGGER.debug(f"subject: {x}, type: {type(x)}")
         LOGGER.debug(f"graph_name: {graph_name}, type: {type(graph_name)}")
-        for s,p,label in self.dataset.triples((x,RDFS.label,None)):
+        for s,p,label in self.triples((x,RDFS.label,None)):
             labels_set.add(label)
         LOGGER.debug(f"labels_set: {labels_set}")
         labels = list(labels_set)
@@ -142,16 +141,10 @@ class DBInterface:
         subjects = []
         labelFound = False
         LOGGER.debug(f"graph_name: {graph_name}")
-        if graph_name is None:
-            for s,p,o,c in self.dataset.quads((None,RDFS.label,label2,None)):
-                labelFound = True
-                if (s,RDF.type,typ,c) in self.dataset:
-                    subjects.append(s)
-        else: # work around b/c quads method doesn't return anything with non-None graph_name
-            for s,p,o in self.dataset.graph(graph_name).triples((None,RDFS.label,label2)):
-                labelFound = True
-                if (s,RDF.type,typ,graph_name) in self.dataset:
-                    subjects.append(s)
+        for s,p,o,c in self.quads((None,RDFS.label,label2,graph_name)):
+            labelFound = True
+            if (s,RDF.type,typ,c) in self.dataset:
+                subjects.append(s)
         LOGGER.debug(f"subjects: {subjects}")
         ### Note that graph_name None means search all graphs!
         if len(subjects) < 1:
@@ -166,12 +159,8 @@ class DBInterface:
     def getComment(self,x,graph_name=None):
         x = self.convertToURIRef(x)
         results = []
-        if graph_name is None:
-            for s,p,o,c in self.dataset.quads((x,RDFS.comment,None,None)):
-                results.append(o.value)
-        else:
-            for s,p,o in self.dataset.graph(graph_name).triples((x,RDFS.comment,None)):
-                results.append(o.value)
+        for s,p,o,c in self.quads((x,RDFS.comment,None,graph_name)):
+            results.append(o.value)
         if len(results) < 1:
             raise DBInterfaceError(f"No comment found for {x} in graph '{graph_name}'")
         return results[0]
@@ -181,7 +170,7 @@ class DBInterface:
 
     def listFeatures(self):
         results = []
-        for s,p,o in self.dataset.graph(self.data_uri_base).triples((None,RDF.type,SOSA.FeatureOfInterest)):
+        for s,p,o in self.triples((None,RDF.type,SOSA.FeatureOfInterest,self.data_uri_base)):
             results.append(s)
         return results
 
@@ -213,10 +202,10 @@ class DBInterface:
         if (prop,None,None) in self.data_graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
         quantityKind = self.convertToURIRef(quantityKind)
-        if len([ quad for quad in self.dataset.quads((quantityKind,RDF.type,QUDT.QuantityKind,None))]) < 1:
+        if len([ quad for quad in self.triples((quantityKind,RDF.type,QUDT.QuantityKind))]) < 1:
             raise DataValidationError(r"Quantity kind not found in database")
         unit = self.convertToURIRef(unit)
-        if len([ quad for quad in self.dataset.quads((unit,RDF.type,QUDT.Unit,None))]) < 1:
+        if len([ quad for quad in self.triples((unit,RDF.type,QUDT.Unit))]) < 1:
             raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
@@ -231,9 +220,9 @@ class DBInterface:
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         label = self.getLabel(observedProperty)
-        unit = list(self.dataset.quads((observedProperty,self.SDTW.hasUnit,None,None)))[0][2]
-        unit_symbols = list(self.dataset.quads((unit,QUDT.symbol,None,None)))
-        unit_ucumCode = list(self.dataset.quads((unit,QUDT.ucumCode,None,None)))
+        unit = list(self.triples((observedProperty,self.SDTW.hasUnit,None)))[0][2]
+        unit_symbols = list(self.triples((unit,QUDT.symbol,None)))
+        unit_ucumCode = list(self.triples((unit,QUDT.ucumCode,None)))
         unit_label = self.getLabel(unit)
         if len(unit_symbols) > 0:
             unit_label = unit_symbols[0][2]
@@ -333,7 +322,7 @@ class DBInterface:
     def build_quantity_kind_list(self):
         self.quantity_kinds = []
         self.quantity_kind_and_label_list = []
-        for s,p,o,c in self.dataset.quads((None,RDF.type,QUDT.QuantityKind,None)):
+        for s,p,o,c in self.quads((None,RDF.type,QUDT.QuantityKind,None)):
             self.quantity_kinds.append(s)
             label = self.getLabel(s,c)
             self.quantity_kind_and_label_list.append((str(s),label))
@@ -342,7 +331,7 @@ class DBInterface:
     def get_units_for_quantity_kind(self,quantity_kind):
         quantity_kind = self.convertToURIRef(quantity_kind)
         results = []
-        for s, p, unit, c in self.dataset.quads((quantity_kind,QUDT.applicableUnit,None,None)):
+        for s, p, unit, c in self.quads((quantity_kind,QUDT.applicableUnit,None,None)):
             label = self.getLabel(unit)
             results.append((str(unit),label))
         results.sort(key=lambda x: x[1])
