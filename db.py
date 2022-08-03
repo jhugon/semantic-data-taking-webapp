@@ -8,7 +8,7 @@ import logging
 import berkeleydb
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+#LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
@@ -211,8 +211,14 @@ class DBInterface:
     def getPrettyTitle(self,observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         label = self.getLabel(observedProperty)
-        unit = self.data_graph.value(observedProperty,self.SDTW.hasUnit)
-        unit_label = self.data_graph.value(unit,QUDT.symbol)
+        unit = list(self.dataset.quads((observedProperty,self.SDTW.hasUnit,None,None)))[0][2]
+        unit_symbols = list(self.dataset.quads((unit,QUDT.symbol,None,None)))
+        unit_ucumCode = list(self.dataset.quads((unit,QUDT.ucumCode,None,None)))
+        unit_label = self.getLabel(unit)
+        if len(unit_symbols) > 0:
+            unit_label = unit_symbols[0][2]
+        elif len(unit_ucumCode) > 0:
+            unit_label = unit_ucumCode[0][2]
         result = f"{label} [{unit_label}]"
         return result
 
