@@ -8,6 +8,7 @@ import logging
 import berkeleydb
 
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
@@ -65,7 +66,8 @@ class DBInterface:
 
         self.dataset = self.load_dataset(self.store_path,self.store_type)
         self.data_graph = self.dataset.graph(self.data_uri_base)
-        #self.build_quantity_kind_list()
+        self.build_quantity_kind_list()
+
         #self.data_graph.serialize(destination="debug.ttl")
 
         self.SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
@@ -75,32 +77,6 @@ class DBInterface:
             self.dataset.close()
         except Exception:
             pass
-
-    def load_dataset(self,store_path,store_type):
-        dataset = None
-        if self.store_type == "BerkeleyDB":
-            dataset = Dataset(self.store_type)
-            try:
-                opencode = dataset.open(store_path,create=False)
-            except berkeleydb.db.DBNoSuchFileError:
-                LOGGER.error(f"Database store {store_path} doesn't exist")
-                raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
-            else:
-                if opencode == NO_STORE:
-                    LOGGER.error(f"Database store {store_path} not initialized")
-                    raise DBStoreError(f"Database store at '{store_path}' not initialized")
-                elif opencode == VALID_STORE:
-                    LOGGER.info(f"Successfully loaded store")
-                    return dataset
-                else:
-                    LOGGER.error(f"Database store {store_path} is corrupted")
-                    raise DBStoreError(f"Database store at '{store_path}' is corrupted")
-        elif store_type == "SPARQLUpdateStore":
-            store = SPARQLUpdateStore(query_endpoint=self.store_path,update_endpoint=self.store_path,node_to_sparql=my_bnode_ext)
-            dataset = Dataset(store)
-            return dataset
-        else:
-            raise ValueError(f"store_type: '{self.store_type}' not allowed")
 
     def convertToURIRef(self,x):
         """
@@ -113,12 +89,17 @@ class DBInterface:
             return URIRef(x)
 
     def getLabel(self,x,graph_name=None):
-        if graph_name is None:
-            graph_name = self.data_uri_base
         x = self.convertToURIRef(x)
         labels_set = set()
-        for label in self.dataset.graph(graph_name).objects(x,RDFS.label):
-            labels_set.add(label)
+        LOGGER.debug(f"subject: {x}, type: {type(x)}")
+        LOGGER.debug(f"graph_name: {graph_name}, type: {type(graph_name)}")
+        if graph_name is None:
+            for s,p,label,c in self.dataset.quads((x,RDFS.label,None,None)):
+                labels_set.add(label)
+        else:
+            for s,p,label in self.dataset.graph(graph_name).triples((x,RDFS.label,None)):
+                labels_set.add(label)
+        LOGGER.debug(f"labels_set: {labels_set}")
         labels = list(labels_set)
         if len(labels) == 0:
             raise DBInterfaceError(f"{x} has no label")
@@ -135,38 +116,54 @@ class DBInterface:
             return labels[0].value
 
     def getSubjectLabeledWithType(self,label,typ,label_lang=None,graph_name=None):
-        if graph_name is None:
-            graph_name = self.data_uri_base
-        graph = self.dataset.graph(graph_name)
         label2 = Literal(label,lang=label_lang)
         LOGGER.debug(f"label2: {label2}")
         subjects = list(graph.subjects(RDFS.label,label2))
+        subjects = []
+        labelFound = False
+        LOGGER.debug(f"graph_name: {graph_name}")
+        if graph_name is None:
+            for s,p,o,c in self.dataset.quads((None,RDFS.label,label2,None)):
+                labelFound = True
+                if (s,RDF.type,typ,c) in self.dataset:
+                    subjects.append(s)
+        else: # work around b/c quads method doesn't return anything with non-None graph_name
+            for s,p,o in self.dataset.graph(graph_name).triples((None,RDFS.label,label2)):
+                labelFound = True
+                if (s,RDF.type,typ,graph_name) in self.dataset:
+                    subjects.append(s)
         LOGGER.debug(f"subjects: {subjects}")
+        ### Note that graph_name None means search all graphs!
         if len(subjects) < 1:
-            raise GetSubjectError(f"No subject with label '{label}'")
-        matching_subjects = set()
-        for subject in subjects:
-            if (subject,RDF.type,typ) in graph:
-                matching_subjects.add(subject)
-        if len(matching_subjects) == 0:
-            raise GetSubjectError(f"No subject with label '{label}' has type '{typ}'")
+            if labelFound:
+                raise GetSubjectError(f"No subject with label '{label}' has type '{typ}' in graph '{graph_name}'")
+            else:
+                raise GetSubjectError(f"No subject with label '{label}' in graph '{graph_name}'")
         elif len(matching_subjects) > 1:
-            raise GetSubjectError(f"Multiple subjects with label '{label}' and type '{typ}'")
+            raise GetSubjectError(f"Multiple subjects with label '{label}' and type '{typ}' in graph '{graph_name}'")
         return subjects[0]
 
     def getComment(self,x,graph_name=None):
-        if graph_name is None:
-            graph_name = self.data_uri_base
         x = self.convertToURIRef(x)
-        return self.dataset.graph(graph_name).value(x,RDFS.comment).value
+        results = []
+        if graph_name is None:
+            for s,p,o,c in self.dataset.quads((x,RDFS.comment,None,None)):
+                results.append(o.value)
+        else:
+            for s,p,o in self.dataset.graph(graph_name).triples((x,RDFS.comment,None)):
+                results.append(o.value)
+        if len(results) < 1:
+            raise DBInterfaceError(f"No comment found for {x} in graph '{graph_name}'")
+        return results[0]
 
     def getListLabels(self,l,graph_name=None):
         return [self.getLabel(x,graph_name=graph_name) for x in l]
 
-    def listFeatures(self,graph_name=None):
-        if graph_name is None:
-            graph_name = self.data_uri_base
-        return self.dataset.graph(graph_name).subjects(RDF.type, SOSA.FeatureOfInterest)
+    def listFeatures(self):
+        results = []
+        for s,p,o in self.dataset.graph(self.data_uri_base).triples((None,RDF.type,SOSA.FeatureOfInterest)):
+            results.append(s)
+        return results
 
     def addNewFeature(self,label,comment):
         if not re.match(r"^\w+$",label):
@@ -186,6 +183,7 @@ class DBInterface:
         return props
 
     def addNewObservableProperty(self,label,comment,feature,quantityKind,unit):
+        LOGGER.debug(f"addNewObservableProperty: label: {label} feature: {feature} quantityKind: {quantityKind} unit: {unit}")
         feature = self.convertToURIRef(feature)
         featureName = self.getLabel(feature)
         if not re.match(r"^\w+$",label):
@@ -195,10 +193,10 @@ class DBInterface:
         if (prop,None,None) in self.data_graph:
             raise ObservablePropertyExistsError(f"Prop with label '{label}' and feature '{featureName}' is already in graph")
         quantityKind = self.convertToURIRef(quantityKind)
-        if (quantityKind,RDF.type,QUDT.QuantityKind) not in self.data_graph:
+        if len([ quad for quad in self.dataset.quads((quantityKind,RDF.type,QUDT.QuantityKind,None))]) < 1:
             raise DataValidationError(r"Quantity kind not found in database")
         unit = self.convertToURIRef(unit)
-        if (unit,RDF.type,QUDT.Unit) not in self.data_graph:
+        if len([ quad for quad in self.dataset.quads((unit,RDF.type,QUDT.Unit,None))]) < 1:
             raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
@@ -307,53 +305,71 @@ class DBInterface:
         return self.quantity_kind_and_label_list
 
     def build_quantity_kind_list(self):
-        self.quantity_kinds = list(self.graph.subjects(RDF.type,QUDT.QuantityKind))
+        self.quantity_kinds = []
         self.quantity_kind_and_label_list = []
-        for quantity_kind in self.quantity_kinds:
-            label = self.getLabel(quantity_kind)
-            self.quantity_kind_and_label_list.append((str(quantity_kind),label))
+        for s,p,o,c in self.dataset.quads((None,RDF.type,QUDT.QuantityKind,None)):
+            self.quantity_kinds.append(s)
+            label = self.getLabel(s,c)
+            self.quantity_kind_and_label_list.append((str(s),label))
         self.quantity_kind_and_label_list.sort(key=lambda x: x[1])
 
     def get_units_for_quantity_kind(self,quantity_kind):
         quantity_kind = self.convertToURIRef(quantity_kind)
         results = []
-        for unit in self.graph.objects(quantity_kind,QUDT.applicableUnit):
+        for s, p, unit, c in self.dataset.quads((quantity_kind,QUDT.applicableUnit,None,None)):
             label = self.getLabel(unit)
             results.append((str(unit),label))
         results.sort(key=lambda x: x[1])
         return results
 
     @staticmethod
-    def initialize_store(store_path, store_type="BerkeleyDB"):
-        graph = None
-        store = None
-        if store_type == "SPARQLUpdateStore":
-            store = SPARQLUpdateStore(node_to_sparql=my_bnode_ext)
-            graph = ConjunctiveGraph(store)
-            graph.open(store_path,create=False)
-        elif store_type == "BerkeleyDB":
-            graph = ConjunctiveGraph(store_type)
-            graph.open(store_path,create=True)
+    def load_dataset(store_path,store_type,create=False):
+        dataset = None
+        if store_type == "BerkeleyDB":
+            dataset = Dataset(store_type)
+            try:
+                opencode = dataset.open(store_path,create=create)
+            except berkeleydb.db.DBNoSuchFileError:
+                LOGGER.error(f"Database store {store_path} doesn't exist")
+                raise DBStoreError(f"Database store at '{store_path}' doesn't exist")
+            else:
+                if opencode == NO_STORE:
+                    LOGGER.error(f"Database store {store_path} not initialized")
+                    raise DBStoreError(f"Database store at '{store_path}' not initialized")
+                elif opencode == VALID_STORE:
+                    LOGGER.info(f"Successfully loaded store")
+                    return dataset
+                else:
+                    LOGGER.error(f"Database store {store_path} is corrupted")
+                    raise DBStoreError(f"Database store at '{store_path}' is corrupted")
+        elif store_type == "SPARQLUpdateStore":
+            store = SPARQLUpdateStore(query_endpoint=store_path,update_endpoint=store_path,node_to_sparql=my_bnode_ext)
+            dataset = Dataset(store)
+            return dataset
         else:
-            raise ValueError(f"DB Store type '{store_type}' not recognized")
-        LOGGER.info(f"Connected to DB")
-        graph.parse("http://qudt.org/schema/qudt/")
-        graph.commit()
-        LOGGER.info(f"QUDT schema committed to DB")
-        graph.parse("http://qudt.org/vocab/quantitykind/")
-        graph.commit()
-        LOGGER.info(f"QUDT quantity kind schema committed to DB")
-        graph.parse("http://qudt.org/vocab/unit/")
-        graph.commit()
-        LOGGER.info(f"QUDT unit vocab committed to DB")
-        graph.parse("ontology/sdtw.ttl")
-        graph.commit()
-        LOGGER.info(f"SDTW vocab committed to DB")
-        graph.parse("ontology/units.ttl")
-        graph.commit()
-        LOGGER.info(f"SDTW units vocab committed to DB")
-        graph.close()
+            raise ValueError(f"store_type: '{store_type}' not allowed")
 
+
+    @staticmethod
+    def initialize_store(store_path, store_type="BerkeleyDB"):
+        dataset = DBInterface.load_dataset(store_path,store_type,create=True)
+        LOGGER.info(f"Connected to DB")
+        dataset.parse("http://qudt.org/schema/qudt/")
+        dataset.commit()
+        LOGGER.info(f"QUDT schema committed to DB")
+        dataset.parse("http://qudt.org/vocab/quantitykind/")
+        dataset.commit()
+        LOGGER.info(f"QUDT quantity kind schema committed to DB")
+        dataset.parse("http://qudt.org/vocab/unit/")
+        dataset.commit()
+        LOGGER.info(f"QUDT unit vocab committed to DB")
+        dataset.parse("ontology/sdtw.ttl")
+        dataset.commit()
+        LOGGER.info(f"SDTW vocab committed to DB")
+        dataset.parse("ontology/units.ttl")
+        dataset.commit()
+        LOGGER.info(f"SDTW units vocab committed to DB")
+        dataset.close()
 
 
 if __name__ == "__main__":
