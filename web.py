@@ -18,13 +18,20 @@ import os.path
 import logging
 import sys
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    #format="%(levelname)s %(name)s L%(lineno)s: %(message)s",
+    level=logging.INFO
+)
 
 app = Flask(__name__)
 
 #### Configuration ###################
 
-app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+#app.config["DB_STORE_PATH"] = "web-db-store.bdb"
+#app.config["DB_STORE_TYPE"] = "BerkeleyDB"
+app.config["DB_STORE_PATH"] = "http://localhost:3030/semweb"
+app.config["DB_STORE_TYPE"] = "SPARQLUpdateStore"
 app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"
 app.config["DB_USERS_URI_BASE"] = os.path.join(app.config["DB_DATA_URI_BASE"],"users/")
 app.config["LOGIN_USER_FILE_PATH"] = "userfile.txt"
@@ -42,13 +49,17 @@ except RuntimeError as e:
 ## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
 app.config.from_prefixed_env()
 
+## Options if using built-in Flask debugging server
+if "RUN_FROM_CLI" in app.config and app.config["RUN_FROM_CLI"]:
+    app.config["SERVER_NAME"] = app.config["SERVER_NAME"] +":5000"
+
 for key in sorted(app.config.keys()):
     if "SECRET" not in key:
         app.logger.info("{:30} = {}".format(key,app.config[key]))
 
 #######################################
 
-db = DBInterface(app.config["DB_STORE_PATH"],app.config["DB_DATA_URI_BASE"])
+db = DBInterface(store_path=app.config["DB_STORE_PATH"],data_uri_base=app.config["DB_DATA_URI_BASE"],store_type=app.config["DB_STORE_TYPE"])
 
 app.register_blueprint(auth)
 login_manager = LoginManager()
@@ -73,8 +84,6 @@ if app.config["PROXY_FORWARDING"]:
 @app.route("/")
 @login_required
 def index():
-    app.logger.debug(request.headers)
-    app.logger.debug(request.host)
     status = None
     try:
         status = request.args["status"]
