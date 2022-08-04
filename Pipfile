@@ -8,6 +8,7 @@ rdflib = "*"
 flask = "*"
 berkeleydb = "*"
 flask-simple-login = {editable = true, path = "./flask-simple-login"}
+httpx = "*"
 
 [dev-packages]
 

@@ -5,9 +5,19 @@ services:
     volumes:
       - ./web-db-store.bdb:/app/web-db-store.bdb
       - ./userfile.txt:/app/userfile.txt
+    environment:
+      FLASK_DB_STORE_TYPE: SPARQLUpdateStore
+      FLASK_DB_STORE_PATH: http://db-server:3030/semweb
   reverse-proxy:
     build: ./nginx
     ports:
       - "8080:80"
     environment:
       NGINX_HOSTNAME: semweb.localhost
+  db-server:
+    build: ./jena-fuseki
+    ports:
+      - "3030:3030"
+    volumes:
+      - ./jenadb/:/app/db
+    #command: ["./apache-jena-fuseki-4.5.0/fuseki-server","--help"]
