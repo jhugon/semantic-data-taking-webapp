@@ -7,7 +7,7 @@ services:
       - ./userfile.txt:/app/userfile.txt
     environment:
       FLASK_DB_STORE_TYPE: SPARQLUpdateStore
-      FLASK_DB_STORE_PATH: http://localhost:3030
+      FLASK_DB_STORE_PATH: http://db-server:3030/semweb
   reverse-proxy:
     build: ./nginx
     ports:
