@@ -14,14 +14,28 @@ LOGGER = logging.getLogger(__name__)
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
 units_query = """
+prefix qudt: <http://qudt.org/schema/qudt/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 select ?unit ?unit_name
+from <http://qudt.org/vocab/quantitykind/>
+from <http://qudt.org/vocab/unit/>
+from <http://schema.hugonlabs.com/sdtw#>
+from <http://ontology.hugonlabs.com/sdtw#>
 where {
     ?unit rdf:type qudt:Unit .
     ?unit rdfs:label ?unit_name .
 }"""
 
 quantity_kind_query = """
+prefix qudt: <http://qudt.org/schema/qudt/>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 select ?qk ?qk_name
+from <http://qudt.org/vocab/quantitykind/>
+from <http://qudt.org/vocab/unit/>
+from <http://schema.hugonlabs.com/sdtw#>
+from <http://ontology.hugonlabs.com/sdtw#>
 where {
     ?qk rdf:type qudt:QuantityKind .
     ?qk rdfs:label ?qk_name .
