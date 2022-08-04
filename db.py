@@ -14,14 +14,14 @@ LOGGER = logging.getLogger(__name__)
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
 units_query = """
-select ?unit_name
+select ?unit ?unit_name
 where {
     ?unit rdf:type qudt:Unit .
     ?unit rdfs:label ?unit_name .
 }"""
 
 quantity_kind_query = """
-select ?qk_name
+select ?qk ?qk_name
 where {
     ?qk rdf:type qudt:QuantityKind .
     ?qk rdfs:label ?qk_name .
