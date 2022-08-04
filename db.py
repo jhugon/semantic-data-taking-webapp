@@ -13,34 +13,6 @@ LOGGER = logging.getLogger(__name__)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
-units_query = """
-prefix qudt: <http://qudt.org/schema/qudt/>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-select ?unit ?unit_name
-from <http://qudt.org/vocab/quantitykind/>
-from <http://qudt.org/vocab/unit/>
-from <http://schema.hugonlabs.com/sdtw#>
-from <http://ontology.hugonlabs.com/sdtw#>
-where {
-    ?unit rdf:type qudt:Unit .
-    ?unit rdfs:label ?unit_name .
-}"""
-
-quantity_kind_query = """
-prefix qudt: <http://qudt.org/schema/qudt/>
-prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-select ?qk ?qk_name
-from <http://qudt.org/vocab/quantitykind/>
-from <http://qudt.org/vocab/unit/>
-from <http://schema.hugonlabs.com/sdtw#>
-from <http://ontology.hugonlabs.com/sdtw#>
-where {
-    ?qk rdf:type qudt:QuantityKind .
-    ?qk rdfs:label ?qk_name .
-}"""
-
 def my_bnode_ext(node):
    if isinstance(node, BNode):
        return '<bnode:b%s>' % node
@@ -104,13 +76,15 @@ class DBInterface:
             return URIRef(x)
 
     def triples(self,quad_or_triple):
+        LOGGER.debug(f"Getting triples for {quad_or_triple}")
         if len(quad_or_triple) == 3 or (len(quad_or_triple) == 4 and quad_or_triple[3] is None):
             for graph in self.dataset.graphs():
                 for tr in graph.triples(quad_or_triple[:3]):
                     yield tr
         elif len(quad_or_triple) == 4:
             graph_name = quad_or_triple[3]
-            return self.dataset.graph(graph_name).triples(quad_or_triple[:3])
+            for tr in self.dataset.graph(graph_name).triples(quad_or_triple[:3]):
+                yield tr
         else:
             raise ValueError(f"argument quad_or_triple: '{quad_or_triple}' should be a 3 or 4 tuple")
 
@@ -129,11 +103,8 @@ class DBInterface:
     def getLabel(self,x,graph_name=None):
         x = self.convertToURIRef(x)
         labels_set = set()
-        LOGGER.debug(f"subject: {x}, type: {type(x)}")
-        LOGGER.debug(f"graph_name: {graph_name}, type: {type(graph_name)}")
         for s,p,label in self.triples((x,RDFS.label,None)):
             labels_set.add(label)
-        LOGGER.debug(f"labels_set: {labels_set}")
         labels = list(labels_set)
         if len(labels) == 0:
             raise DBInterfaceError(f"{x} has no label")
@@ -335,12 +306,26 @@ class DBInterface:
         return self.quantity_kind_and_label_list
 
     def build_quantity_kind_list(self):
+        quantity_kind_query = """
+        prefix qudt: <http://qudt.org/schema/qudt/>
+        prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        select ?qk ?qk_name
+        from <http://qudt.org/vocab/quantitykind/>
+        from <http://qudt.org/vocab/unit/>
+        from <http://schema.hugonlabs.com/sdtw#>
+        from <http://ontology.hugonlabs.com/sdtw#>
+        where {
+            ?qk rdf:type qudt:QuantityKind .
+            ?qk rdfs:label ?qk_name .
+        }"""
+
         self.quantity_kinds = []
         self.quantity_kind_and_label_list = []
-        for s,p,o,c in self.quads((None,RDF.type,QUDT.QuantityKind,None)):
-            self.quantity_kinds.append(s)
-            label = self.getLabel(s,c)
-            self.quantity_kind_and_label_list.append((str(s),label))
+        qres = self.dataset.query(quantity_kind_query)
+        for row in qres:
+            self.quantity_kinds.append(row.qk)
+            self.quantity_kind_and_label_list.append((row.qk,row.qk_name))
         self.quantity_kind_and_label_list.sort(key=lambda x: x[1])
 
     def get_units_for_quantity_kind(self,quantity_kind):

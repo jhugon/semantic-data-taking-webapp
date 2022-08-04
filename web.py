@@ -18,7 +18,11 @@ import os.path
 import logging
 import sys
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    #format="%(levelname)s %(name)s L%(lineno)s: %(message)s",
+    level=logging.INFO
+)
 
 app = Flask(__name__)
 
@@ -80,8 +84,6 @@ if app.config["PROXY_FORWARDING"]:
 @app.route("/")
 @login_required
 def index():
-    app.logger.debug(request.headers)
-    app.logger.debug(request.host)
     status = None
     try:
         status = request.args["status"]
