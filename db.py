@@ -6,6 +6,7 @@ import os.path
 import re
 import logging
 import berkeleydb
+import httpx
 
 LOGGER = logging.getLogger(__name__)
 #LOGGER.setLevel(logging.DEBUG)
@@ -367,25 +368,59 @@ class DBInterface:
 
     @staticmethod
     def initialize_store(store_path, store_type="BerkeleyDB"):
-        dataset = DBInterface.load_dataset(store_path,store_type,create=True)
-        LOGGER.info(f"Connected to DB")
-        dataset.parse("http://qudt.org/schema/qudt/")
-        dataset.commit()
-        LOGGER.info(f"QUDT schema committed to DB")
-        dataset.parse("http://qudt.org/vocab/quantitykind/")
-        dataset.commit()
-        LOGGER.info(f"QUDT quantity kind schema committed to DB")
-        dataset.parse("http://qudt.org/vocab/unit/")
-        dataset.commit()
-        LOGGER.info(f"QUDT unit vocab committed to DB")
-        dataset.parse("ontology/sdtw.ttl")
-        dataset.commit()
-        LOGGER.info(f"SDTW vocab committed to DB")
-        dataset.parse("ontology/units.ttl")
-        dataset.commit()
-        LOGGER.info(f"SDTW units vocab committed to DB")
-        dataset.close()
+        if store_type == "BerkeleyDB":
+            dataset = DBInterface.load_dataset(store_path,store_type,create=True)
+            LOGGER.info(f"Connected to DB")
+            dataset.parse("http://qudt.org/schema/qudt/")
+            dataset.commit()
+            LOGGER.info(f"QUDT schema committed to DB")
+            dataset.parse("http://qudt.org/vocab/quantitykind/")
+            dataset.commit()
+            LOGGER.info(f"QUDT quantity kind schema committed to DB")
+            dataset.parse("http://qudt.org/vocab/unit/")
+            dataset.commit()
+            LOGGER.info(f"QUDT unit vocab committed to DB")
+            dataset.parse("ontology/sdtw.ttl")
+            dataset.commit()
+            LOGGER.info(f"SDTW vocab committed to DB")
+            dataset.parse("ontology/units.ttl")
+            dataset.commit()
+            LOGGER.info(f"SDTW units vocab committed to DB")
+            dataset.close()
+        elif store_type == "SPARQLUpdateStore":
+            LOGGER.info(f"Using Graph Store Protocol to upload triples into DB...")
+            with open("ontology/sdtw.ttl") as f:
+                graph_store_post(store_path,f.read(),"http://ontology.hugonlabs.com/sdtw#")
+            LOGGER.info(f"sdtw.ttl ontology uploaded")
+            with open("ontology/units.ttl") as f:
+                graph_store_post(store_path,f.read(),"http://schema.hugonlabs.com/sdtw#")
+            LOGGER.info(f"units.ttl ontology uploaded")
+            for url in ["http://qudt.org/schema/qudt/","http://qudt.org/vocab/quantitykind/","http://qudt.org/vocab/unit/"]:
+                LOGGER.info(f"Downloading triples from {url}")
+                response = httpx.get(url,follow_redirects=True)
+                response.raise_for_status()
+                content_type = response.headers["content-type"]
+                LOGGER.info(f"Uploading triples from {url} with content-type '{content_type}'")
+                #LOGGER.info(response.text)
+                graph_store_post(store_path,response.text,graph_uri=url,content_type=content_type)
+                LOGGER.info(f"Done with {url}")
 
+def graph_store_post(url,rdftext,graph_uri=None,content_type="text/turtle"):
+    """
+    url is the location of the server's graph store post endpoint
+    rdftext is the text to send
+    graph_uri is the named graph to send this to, None for default
+    """
+
+    params = {}
+    if graph_uri is None:
+        params["default"] = None
+    else:
+        params["graph"] = graph_uri
+    headers = {}
+    headers["Content-Type"] = content_type
+    response = httpx.post(url,params=params,headers=headers,data=rdftext)
+    response.raise_for_status()
 
 if __name__ == "__main__":
     import argparse
