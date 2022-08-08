@@ -1,0 +1,11 @@
+## For running a production DB
+services:
+  db-server:
+    build: .
+    ports:
+      - "3030:3030"
+    volumes:
+      - db_vol:/app/db
+    restart: always
+volumes:
+  db_vol:
