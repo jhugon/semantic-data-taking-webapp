@@ -36,4 +36,4 @@ COPY web.py .
 
 EXPOSE 8000
 
-CMD ["pipenv","run","gunicorn","-w","1","-b", "0.0.0.0", "web:app"]
+CMD ["pipenv","run","gunicorn","-w","1","-b", "0.0.0.0", "web:create_app()"]
