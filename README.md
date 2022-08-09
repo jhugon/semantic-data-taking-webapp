@@ -1,6 +1,8 @@
 # Semantic Data Taking Web-app
 
-This app is a Flask-based dynamic website that uses an RDF graph database to store data. Initially, the website is for manually entering data into HTML forms. The entered data can then be viewed in tables.
+This app is a Flask-based dynamic website that uses an RDF graph database to
+store data. Initially, the website is for manually entering data into HTML
+forms. The entered data can then be viewed in tables.
 
 ## Run locally with Docker
 
@@ -34,14 +36,19 @@ python db.py --init web-db-store.bdb
 Run the server:
 
 ```bash
-export FLASK_APP=web.py
-export FLASK_ENV=development
-flask run
+python web.py
 ```
+
+Access the site at https://semweb.localhost:5000
+
+The test site uses a dummy SSL certificate that updates on every server
+restart, so you will have to allow that in your browser after every update.
 
 ## Example Scenario
 
-A simple example of usage would be to collect data on the fuel economy of a car. When filling up a car, the user would enter the odometer reading and amount of fuel put into the car.
+A simple example of usage would be to collect data on the fuel economy of a
+car. When filling up a car, the user would enter the odometer reading and
+amount of fuel put into the car.
 
 ## Schema Design
 

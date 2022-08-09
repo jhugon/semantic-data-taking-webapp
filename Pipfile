@@ -9,6 +9,8 @@ flask = "*"
 berkeleydb = "*"
 flask-simple-login = {editable = true, path = "./flask-simple-login"}
 httpx = "*"
+flask-talisman = "*"
+cryptography = "*"
 
 [dev-packages]
 

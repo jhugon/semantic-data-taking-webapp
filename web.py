@@ -3,6 +3,7 @@ from flask import request
 from flask import render_template, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
+from flask_talisman import Talisman
 
 from db import DBInterface, DataValidationError, GetSubjectError, QUDT
 from flask_simple_login import (
@@ -66,6 +67,13 @@ def create_app():
 
     db = DBInterface(store_path=app.config["DB_STORE_PATH"],data_uri_base=app.config["DB_DATA_URI_BASE"],store_type=app.config["DB_STORE_TYPE"])
 
+    content_security_policy = {
+        "default-src": [
+            "'self'",
+            "cdn.jsdelivr.net",
+        ]
+    }
+    talisman = Talisman(app,content_security_policy=content_security_policy)
     app.register_blueprint(auth)
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -207,3 +215,8 @@ def create_app():
         return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=success")
 
     return app
+
+if __name__ == "__main__":
+    import os
+    os.environ["FLASK_SERVER_NAME"] = "semweb.localhost:5000"
+    create_app().run("0.0.0.0",debug=True,port=5000,ssl_context="adhoc")
