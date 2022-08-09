@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.1.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.1.1) - 2022-08-09
+
+- [`ab18a31`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ab18a313728bb94bd569689db5ee131feb3a50e1) chore(DB): BerkeleyDB backend doesnt work anymore so clean up
+- [`876b884`](https://github.com/jhugon/semantic-data-taking-webapp/commit/876b8847a04a6676533039e9aa12c7190428bdf3) fix: made DB code more resilient to coming up before DB
+- [`722e78c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/722e78c6967c644e304ec7f32248d45c05b6ae7a) ci: adding black.yml CI workflow
+- [`73c9cd5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/73c9cd5caf8da53aef3e6e1bb83de3802615f908) ci: moved uplift workflow to uplift.yml
+- [`86a3ae3`](https://github.com/jhugon/semantic-data-taking-webapp/commit/86a3ae336d1ee3af83c8d3dd07e86bc7430c0c0a) ci: installed and ran pre-commit plugins, inc. black
+
 ## [v0.1.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.1.0) - 2022-08-09
 
 - [`7fae9d9`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7fae9d9c79405d6cde15b6078287a5d53cd37a1b) ci: added Uplift CI for conventional commits
