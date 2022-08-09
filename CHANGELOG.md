@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.2.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.2.0) - 2022-08-09
+
+- [`0e7eced`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0e7eced0ef35293b3d26e301874c86faea27d9ff) feat: Dockerfile just install pkgs from Pipfile.lock
+- [`217f4d1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/217f4d109c0b92a48159e68e9a20866bbd0ec66a) fix: add back berkeleydb package (broke w/ last commit)
+
 ## [v0.1.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.1.1) - 2022-08-09
 
 - [`ab18a31`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ab18a313728bb94bd569689db5ee131feb3a50e1) chore(DB): BerkeleyDB backend doesnt work anymore so clean up
