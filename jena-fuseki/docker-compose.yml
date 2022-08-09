@@ -7,5 +7,9 @@ services:
     volumes:
       - db_vol:/app/db
     restart: always
+    logging:
+      driver: gcplogs
+      options:
+        gcp-meta-name: db-server
 volumes:
   db_vol:
