@@ -1,0 +1,105 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## Unreleased
+
+## [v0.1.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.1.0) - 2022-08-09
+
+- [`7fae9d9`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7fae9d9c79405d6cde15b6078287a5d53cd37a1b) ci: added Uplift CI for conventional commits
+- [`7da5375`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7da537578363bacc913a650b6f8808d889e62a17) chore: Merge pull request #30 from jhugon/SSL
+- [`abb3e75`](https://github.com/jhugon/semantic-data-taking-webapp/commit/abb3e750d370fea491a2fa9281dcd193d22ba19b) fix: flask-simple-login update--dont print passwords
+- [`29ea863`](https://github.com/jhugon/semantic-data-taking-webapp/commit/29ea86302b323028defd9619f958196e7aa2b9b3) feat(web): log that secret key is loaded from environment
+- [`849db7f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/849db7fea3a63bb719abed00cb0c751cfa46a5d1) feat(web): configured security headers to be extra secure
+- [`57f47a4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/57f47a45938b653314a2660c546fa575d7244318) feat(Nginx): server tokens all off
+- [`6b7e472`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6b7e4720bd2d8ed04c1b9eedabbd6accf6a45d9d) feat: Nginx container now usses TLSv1.3
+- [`c497e4b`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c497e4b77d973eb698e1b0ffc9f93a2c673f860d) feat: Enable Flask-Talisman & SSL in test server
+- [`2b2db3e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/2b2db3e9a6cbc30d0927273b894696990b3c0542) feat(fuseki): docker compose log to GCP
+- [`2281426`](https://github.com/jhugon/semantic-data-taking-webapp/commit/22814266012f6c1d6fb3f1016430ed5f49072089) chore: Merge pull request #28 from jhugon/cloudrun
+- [`d715259`](https://github.com/jhugon/semantic-data-taking-webapp/commit/d7152598e3a36ce047e811e43efa181671ae224a) feat(docker): add jena-fuseki/docker-compose.yml
+- [`72656f2`](https://github.com/jhugon/semantic-data-taking-webapp/commit/72656f247b0c71287f22cf45abe2cbc765f30216) refactor: delete Docker.cloudrun and make it a softlink
+- [`0027d5f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0027d5fb663e576b075365ad979cd91bf49708ff) chore: Merge branch main into cloudrun
+- [`294c329`](https://github.com/jhugon/semantic-data-taking-webapp/commit/294c32997e2eec6ff236a43523e7524d850d31c4) refactor(web.py): use factory pattorn with app
+- [`1bebcd1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1bebcd1368974d69073e1a75472404988ab4970b) Merge branch main into cloudrun
+- [`549ffe8`](https://github.com/jhugon/semantic-data-taking-webapp/commit/549ffe80028f508d458c2576a00a364bb783a217) Merge pull request #23 from jhugon/sparql_server
+- [`fd151bd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/fd151bd26487b2fa8c5722d49d40ca17a920d04e) Got app connecting to sparql store in Docker
+- [`46bad5d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/46bad5d308914bf2cc74b5ad862722a3ca5882da) use sparql query to build quantity kind list
+- [`6a4c1f8`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6a4c1f81b1d834d615104cd56c6aa0971985954c) more work on queries
+- [`3f83b1b`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3f83b1b7ca25a81b45cb5dc15cd5bac148bcb6b4) working on sparql queries
+- [`a86c1fd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a86c1fd7d974ef0060c6737d2834dcf278d942f5) use sparql graph store proto to upload vocabs
+- [`319fe5d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/319fe5d9b174ba076ffdbe8df15eee87e80a262f) make my own quads and triples methods on DBInterface
+- [`3c232a5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3c232a5b400a2c9d3e5a2c1f91213cc22b3f0aeb) messing with diff ways to get quads/triples to make work with jena
+- [`a0b1aaa`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a0b1aaadf325edb06eef27b93040859efc494320) working on getting db to work with jena-fuseki
+- [`a27e218`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a27e218d9b207d3a56e80e1d6469491653268f15) fix bug introduce that messes up unit sybols in tables
+- [`b15b501`](https://github.com/jhugon/semantic-data-taking-webapp/commit/b15b501dc01e0fc6c719dce4612eb477e17d7012) Got RDF dataset working better
+- [`253bead`](https://github.com/jhugon/semantic-data-taking-webapp/commit/253beade1e6ae47a31530358a48c1609b5dddbf2) Now select out the graph from the dataset better
+- [`23d7fc4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/23d7fc45aed9abe2fd8370ec2298eef0545d9aea) Working on converting db.py to use rdf datasets
+- [`c15544c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c15544c1f418db6bfa8eff1d6e52291308df9c9c) working on making rdflib work with jena-fuseki
+- [`e5557d2`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e5557d2e948c4c904c3f301d46063626e24c2178) got log info working in db.py __main__
+- [`2efa8cb`](https://github.com/jhugon/semantic-data-taking-webapp/commit/2efa8cbeab7575bfe9c61e2de139a80b4e6dbcc6) trying to make initialize db work with sparql server
+- [`1ee5b21`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1ee5b217766bd5a0867091c729946297cde7e594) Working on adding Apache Jena Fuseki SPARQL Server
+- [`69ddde2`](https://github.com/jhugon/semantic-data-taking-webapp/commit/69ddde25f8f40518a7d72fc73c3d628ab5655205) added options to configure RDF DB type
+- [`4c888ab`](https://github.com/jhugon/semantic-data-taking-webapp/commit/4c888ab66ae6c6ecf7c4db13652bfc544ffa859c) Added manual db init, resolves #19
+- [`4610195`](https://github.com/jhugon/semantic-data-taking-webapp/commit/4610195edfebc3e77de028b5edc0f61985d92d5d) Do things as user semweb in Dockerfiles
+- [`a7e9a7d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a7e9a7ddd4cf1adca062f59aafb14a0c9fcf6142) cloudbuild: think I have the submodule URL correct now
+- [`6771ff9`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6771ff948d48d375d0ca11e4bc81c376acf3369b) cloudbuild: trying now with Google Source repo
+- [`8f452da`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8f452dab53e0fb2dce49b742d6ced1fbe50d1a8f) Try adding git submodule update
+- [`8534dcd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8534dcdcb4753d39d53af489624a4cad8b29eac3) Try to run git submodule init in cloudbuild
+- [`6a97b5d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6a97b5d0f470e16383e4a779f961ba7c0455e541) still debugging cloudbuild
+- [`5eed8e1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/5eed8e139307b253ff6fb928a52bd657f50450a5) Add git submodule init to cloudbuild.yaml
+- [`085a8e5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/085a8e57481673222a492006998933d1a5a0b94e) added cloudbuild.yaml file (still debugging cloudbuild)
+- [`36329d0`](https://github.com/jhugon/semantic-data-taking-webapp/commit/36329d044af4c76b6c7461d0478993da1127c2c3) more cloudrun build debugging
+- [`8d3b06a`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8d3b06a6d15240c2744f8116a8db8ec0856ec3de) Trying to debug Dockerfile.cloudrun
+- [`522816f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/522816fe5e6bded5b355eb55b8eeb965bc83113b) Added Dockerfile.cloudrun, preparing for Google Cloud Run
+- [`efbea4e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/efbea4eb02c63d356550ca93229a905e0114e011) updated README with Docker instructions
+- [`676d9f6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/676d9f641bc9d826d5b3b56fda2587bbd574f3b8) Merge pull request #18 from jhugon/add_app_configuration
+- [`ebd9597`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ebd959722fb47a5ec519c1eac03cada704f8219b) Can now update flask config with file or env vars
+- [`51ad252`](https://github.com/jhugon/semantic-data-taking-webapp/commit/51ad252c9f7ed3276da2488d0ac564d496014a13) added configurable RDF data and user URIs for #17
+- [`99fb3df`](https://github.com/jhugon/semantic-data-taking-webapp/commit/99fb3df5c87dd5d2b37e7623238e299c314c8a85) Got configurable flask server hostname working for #7
+- [`a1b9e0b`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a1b9e0b939184aaffb6e9be9fa1c914116651a5f) Added configuration params for path to DB and user file
+- [`c75bc30`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c75bc30f810ddcc6779327d7c29f5e9c4523fd36) Now log flask configuration
+- [`b89b197`](https://github.com/jhugon/semantic-data-taking-webapp/commit/b89b19784aadd37e9510bfba6e64bb175758be13) Merge pull request #16 from jhugon/docker
+- [`3c5fb26`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3c5fb26be2789ec513bf2ab372944969345ee4b3) nginx: made hostname configurable with an env var
+- [`274b445`](https://github.com/jhugon/semantic-data-taking-webapp/commit/274b445276a2c998bb23bd49c1aea51e13f9be75) Got nginx config.d/default.conf working
+- [`514c7eb`](https://github.com/jhugon/semantic-data-taking-webapp/commit/514c7ebb49c7b929e1418f3096ec4ecd5e7a1444) simplified nginx.conf
+- [`dc4e961`](https://github.com/jhugon/semantic-data-taking-webapp/commit/dc4e9611185cf46569efd3e663e5c99893e93d1d) nginx working
+- [`0f11cb6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0f11cb6b2b7d9c05779a8299a0b16de166b40250) working on nginx Docker config
+- [`8c80c14`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8c80c140796d1093108c4fd5ad7b810e57228678) Docker uses Gunicorn now, but with an issue with worker timeouts
+- [`fb894d6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/fb894d65bdee993102adcef2a22181338745cd54) Added a Dockerfile
+- [`e66ea98`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e66ea98d82b0c1efe90418a561fe5ec01c536fc6) Merge pull request #8 from jhugon/flask-simple-login
+- [`d671341`](https://github.com/jhugon/semantic-data-taking-webapp/commit/d671341e7d65c368f90fd71483212ba32683a4fd) Working on connecting login user to DB user #3
+- [`ece53a3`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ece53a3bc851d14cdd10b762e05f812150d15be6) Do some bootstrap styling
+- [`b3badc1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/b3badc150eff790f332f2972409f8c8ea9f5b285) Updated to use new templates for all pages
+- [`f1ab267`](https://github.com/jhugon/semantic-data-taking-webapp/commit/f1ab267c0d4a528c139c3c8eb128d8f0168f7f08) working on using flask-simple-login
+- [`ee5fb6d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ee5fb6d013188fd0e6d3d44eac421f9c160dde22) Added some templates from flask-simple-login
+- [`567aef1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/567aef11d1b51e7b2e122f06bf6a11f5786a0ac6) Updated things for Python 3.10
+- [`8508cb7`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8508cb7211fea3da3e584f25f2426d7660edd2d1) Added fuel economy and fuel price QKs and units
+- [`91608db`](https://github.com/jhugon/semantic-data-taking-webapp/commit/91608dbaa74cc294b8b585b9001b238673264ea3) hints on quantity kinds
+- [`c9f48db`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c9f48db86d39fb1c537ed33041e9ced912c969ef) persistent DB is working
+- [`e8526b9`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e8526b9b786bf4a9f2e0022bb8399dbe9134d98a) working on BerkeleyDB store for graph DB
+- [`a2ae479`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a2ae479cbc0f141f2fa42c2405c2cfa33e52ad44) Add a little server-side validation to QK and unit
+- [`06f3cb2`](https://github.com/jhugon/semantic-data-taking-webapp/commit/06f3cb266122b44ecbc7fd8f7a6b847b0552388a) Got status to show up on Add Property
+- [`4cd981d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/4cd981d61838104d2329b8b65b837efceb7da6b5) Adding properties seems to work now
+- [`4cc83cf`](https://github.com/jhugon/semantic-data-taking-webapp/commit/4cc83cfdbff6327f91b96f3804c1208b91b91b0e) redid quantityKind/Unit lists in db.py
+- [`88f65dc`](https://github.com/jhugon/semantic-data-taking-webapp/commit/88f65dc020cb9edb7291f5b32643fb92d5bca5f6) working on add property web
+- [`481339d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/481339d0721b9c2bb0f56439356f0f8d95542e89) Added addproperty page, not yet functional
+- [`9bc33b5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9bc33b5bec170cb427df8ebdb9725a95983d4277) web can now add features
+- [`87a7f66`](https://github.com/jhugon/semantic-data-taking-webapp/commit/87a7f66eee89005132f5f98325923cbb366095be) deal with some data validation errors
+- [`c2e6caa`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c2e6caa0519555828d773d3e72002ba9b9ed882a) added web interface to basic data entry
+- [`7771d30`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7771d30563569036c0e717394a3aaf3261e2d442) db: added enterData method
+- [`0401330`](https://github.com/jhugon/semantic-data-taking-webapp/commit/040133052972da573f64f20ff487833690821544) working on data entry db methods
+- [`cbd8559`](https://github.com/jhugon/semantic-data-taking-webapp/commit/cbd85593bcd8acbe3895569a6c222cd0922fdd8b) table viewing on web working
+- [`1d0a51f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1d0a51fa14ce117236f6e18330b4960df5016326) starting on Flask web part
+- [`c0da7ac`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c0da7ac9d4e9a3407941216b9e76392efa601d5e) added get_data method to db.py
+- [`c94ff6a`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c94ff6aba51d8507a6e603c8610f4eabb4ec3385) Added getColumnHeadings to db.py
+- [`190976f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/190976fff3e5179464ef7cc8cc91641ff55f71b1) working on things
+- [`9aec606`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9aec60604422579511363ca1d853558fcebe72f1) fixed and extended car-extended.ttl
+- [`335ac9e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/335ac9e704979e090e634dea5a70ed38d1667cfc) working on car-example.ttl
+- [`11c7ae7`](https://github.com/jhugon/semantic-data-taking-webapp/commit/11c7ae7d44e70dec3c9662d4830159123d5a81f3) updated ontology to not make subclasses, just some properties
+- [`226e5e8`](https://github.com/jhugon/semantic-data-taking-webapp/commit/226e5e8dea0efdf8bab185eb40968a6c4608293a) Added sample.ttl
+- [`1ffed81`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1ffed81d56c776538f8ccb7be5940574ee260c48) initial draft of ontology/sdtw.owl complete
+- [`0cd5e13`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0cd5e1387695d8c554c4f135d583fd80dde43929) added PipFiles and ontology/sdtw.owl
+- [`218a323`](https://github.com/jhugon/semantic-data-taking-webapp/commit/218a32394fd5dc99cc0a2d0c2789bfe36cb8bffb) Update README.md
+- [`8992551`](https://github.com/jhugon/semantic-data-taking-webapp/commit/89925516a153ad86a162423f797a084cdb1ac6c5) Initial commit
