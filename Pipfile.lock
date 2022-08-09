@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "65817cc118095c1e79e403b210602771d77781c1498b7b8862da466f277f78bf"
+            "sha256": "9ebdb46ef4555a33839fe250640bc10e38aaf719d50d16563cef4782cec5e015"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,6 +31,13 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.7.4"
+        },
+        "berkeleydb": {
+            "hashes": [
+                "sha256:d8c2efbca9472f8848b13cce4f4904a5ea1e1540ee576e626a1491817832a50a"
+            ],
+            "index": "pypi",
+            "version": "==18.1.5"
         },
         "blinker": {
             "hashes": [
