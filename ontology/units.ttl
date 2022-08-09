@@ -43,5 +43,3 @@
     qudt:unitOfSystem sou:IMPERIAL ;
     qudt:symbol "US$/Gal" ;
     .
-
-

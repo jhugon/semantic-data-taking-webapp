@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 
+          fetch-depth: 0 #
       # Additional steps specified here
       - name: Release
         if: github.ref == 'refs/heads/main'
@@ -21,4 +21,4 @@ jobs:
         with:
           args: release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} #

@@ -6,11 +6,11 @@ forms. The entered data can then be viewed in tables.
 
 ## Run locally with Docker
 
-1. Make directories: 
+1. Make directories:
     ```bash
     mkdir -p certs jenadb`
     ```
-2. Generate a self-signed certificate: 
+2. Generate a self-signed certificate:
     ```bash
     openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -sha256 -days 365 -nodes -subj '/CN=semweb.localhost'
     ```
@@ -87,7 +87,7 @@ So the only custom Ontological pieces would be:
 - `sdtw:hasQuantityKind` mapping from `sosa:ObservableProperty` to `qudt:QuantityKind`
 - `sdtw:hasUnit` mapping from `sosa:ObservableProperty` to `qudt:Unit`
 - `sdtw:hasTime` mapping from `ssn:Stimulus` to `xsd:dataTime` (or `sosa:resultTime`?)
-    
+
 ## User Interface Design
 
 *Assuming the schema (metadata including feature of interest and observable properties) for a data taking scenario is already in the database for now*
@@ -101,7 +101,7 @@ So the only custom Ontological pieces would be:
       - A table
         - Columns: the resultTime and one for each `sosa:ObservableProperty`
         - Rows: One for each `ssn:Stimulus`
-        
+
 ## Database Key Design
 
 Assuming all of this is present in `ex:`.

@@ -23,10 +23,10 @@ Ontology(<http://ontology.hugonlabs.com/sdtw#>
   Annotation(dcterms:rights "Copyright 2021 Justin Hugon.")
   Annotation(dcterms:title "Semantic Data Taking Web-app Ontology"@en)
   Annotation(rdfs:seeAlso <https://github.com/jhugon/semantic-data-taking-webapp>)
-  
-  
+
+
   ##########################################
-  
+
   Declaration(AnnotationProperty(dcterms:created))
   Declaration(AnnotationProperty(dcterms:creator))
   Declaration(AnnotationProperty(dcterms:description))
@@ -35,16 +35,16 @@ Ontology(<http://ontology.hugonlabs.com/sdtw#>
   Declaration(AnnotationProperty(dcterms:title))
 
   ##########################################
-  
+
   Declaration(ObjectProperty(:hasTime))
-  ObjectPropertyDomain(:hasTime ssn:Stimulus ) 
-  ObjectPropertyRange( :hasTime xsd:dateTime ) 
-  
+  ObjectPropertyDomain(:hasTime ssn:Stimulus )
+  ObjectPropertyRange( :hasTime xsd:dateTime )
+
   Declaration(ObjectProperty(:hasQualityKind))
   ObjectPropertyDomain(:hasQualityKind sosa:ObservableProperty )
-  ObjectPropertyRange( :hasQualityKind qudt:QuantityKind ) 
+  ObjectPropertyRange( :hasQualityKind qudt:QuantityKind )
 
   Declaration(ObjectProperty(:hasUnit))
   ObjectPropertyDomain(:hasUnit sosa:ObservableProperty )
-  ObjectPropertyRange( :hasUnit qudt:Unit ) 
+  ObjectPropertyRange( :hasUnit qudt:Unit )
 )
