@@ -53,6 +53,13 @@ Access the site at https://semweb.localhost:5000
 The test site uses a dummy SSL certificate that updates on every server
 restart, so you will have to allow that in your browser after every update.
 
+## Setting up for development:
+
+```bash
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
 ## Example Scenario
 
 A simple example of usage would be to collect data on the fuel economy of a
