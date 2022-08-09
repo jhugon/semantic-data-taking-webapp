@@ -37,8 +37,6 @@ def create_app():
 
     #### Configuration ###################
 
-    # app.config["DB_STORE_PATH"] = "web-db-store.bdb"
-    # app.config["DB_STORE_TYPE"] = "BerkeleyDB"
     app.config["DB_STORE_PATH"] = "http://localhost:3030/semweb"
     app.config["DB_STORE_TYPE"] = "SPARQLUpdateStore"
     app.config["DB_DATA_URI_BASE"] = "http://data-webapp.hugonlabs.com/test1/"

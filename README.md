@@ -39,7 +39,7 @@ flask-simple-login-gen-user-file-line > userfile.txt
 Initialize the database:
 
 ```bash
-python db.py --init web-db-store.bdb
+python db.py --init berkeleydb
 ```
 
 Run the server:

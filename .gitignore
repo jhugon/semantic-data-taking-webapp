@@ -131,6 +131,5 @@ dmypy.json
 .*~
 .*.swp
 userfile.txt
-web-db-store.bdb/
 jenadb/
 certs/
