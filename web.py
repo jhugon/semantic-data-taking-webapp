@@ -44,8 +44,12 @@ def create_app():
     app.config["PROXY_FORWARDING"] = True
 
     app.config["SERVER_NAME"] = "semweb.localhost"
-    app.config["SESSION_PROTECTION"] = "strong"
     app.config["SECRET_KEY"] = b"dummy"
+
+    app.config["PREFERRED_URL_SCHEME"] = "https"
+    app.config["SESSION_PROTECTION"] = "strong"
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
 
     ## override above with contents of file in this environment variable:
     try:
