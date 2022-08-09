@@ -6,11 +6,20 @@ forms. The entered data can then be viewed in tables.
 
 ## Run locally with Docker
 
-```bash
-docker compose up --build
-```
+1. Make directories: 
+    ```bash
+    mkdir -p certs jenadb`
+    ```
+2. Generate a self-signed certificate: 
+    ```bash
+    openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -sha256 -days 365 -nodes -subj '/CN=semweb.localhost'
+    ```
+3. Start the services:
+    ```bash
+    docker compose up --build
+    ```
 
-The app should be visible at `http://semweb.localhost:8080`
+The app should be visible at `https://semweb.localhost:8080`
 
 ## Run Test Server
 
