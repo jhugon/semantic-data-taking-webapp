@@ -7,6 +7,7 @@ import re
 import logging
 import berkeleydb
 import httpx
+import time
 
 LOGGER = logging.getLogger(__name__)
 # LOGGER.setLevel(logging.DEBUG)
@@ -64,7 +65,22 @@ class DBInterface:
         LOGGER.info(f"DB data URI base: {self.data_uri_base}")
 
         self.dataset = self.load_dataset(self.store_path, self.store_type)
-        self.data_graph = self.dataset.graph(self.data_uri_base)
+        nRetries = 3
+        retryTimeout = 5
+        for iTry in reversed(range(nRetries + 1)):
+            try:
+                self.data_graph = self.dataset.graph(self.data_uri_base)
+            except Exception as e:
+                LOGGER.warning(
+                    f"Error while reading from dataset: {type(e)} {e}, retrying in {retryTimeout} s"
+                )
+                if iTry == 0:
+                    raise Exception(
+                        f"Couldn't access dataset after {nRetries} {type(e)} {e}"
+                    )
+                time.sleep(retryTimeout)
+            else:
+                break
         self.build_quantity_kind_list()
 
         # self.data_graph.serialize(destination="debug.ttl")

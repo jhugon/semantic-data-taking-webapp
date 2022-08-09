@@ -10,6 +10,8 @@ services:
     environment:
       FLASK_DB_STORE_TYPE: SPARQLUpdateStore
       FLASK_DB_STORE_PATH: http://db-server:3030/semweb
+    depends_on:
+      - db-server
   reverse-proxy:
     build: ./nginx
     ports:
@@ -19,6 +21,8 @@ services:
     volumes:
       - ./certs/cert.pem:/certs/cert.pem
       - ./certs/key.pem:/certs/key.pem
+    depends_on:
+      - semantic-app
   db-server:
     build: ./jena-fuseki
     ports:
