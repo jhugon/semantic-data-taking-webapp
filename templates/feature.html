@@ -17,4 +17,23 @@
     <p>
         <a href="/addproperty?feature={{ featureURLEncoded }}" class="btn btn-secondary">Add New Property</a>
     </p>
+  <h3>Properties</h3>
+    <table class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <th>Quantity Kind</th>
+        <th>Unit</th>
+        <th>Comment</th>
+      </tr>
+      {% for prop in properties %}
+        <tr>
+          <td>{{ prop["label"] }}</td>
+          <td>{{ prop["qk"]}}</td>
+          <td>{{ prop["unit"] }}</td>
+          <td>{{ prop["coment"] }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  <h3>Feature Comment</h3>
+  {{ featureComment }}
 {% endblock %}

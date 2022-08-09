@@ -286,6 +286,14 @@ class DBInterface:
         result = f"{label} [{unit_label}]"
         return result
 
+    def getPropertyQuantityKindAndUnit(self, observedProperty):
+        observedProperty = self.convertToURIRef(observedProperty)
+        quantityKind = list(
+            self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+        )[0][2]
+        unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[0][2]
+        return quantityKind, unit
+
     def getColumnHeadings(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))

@@ -131,11 +131,24 @@ def create_app():
     def features():
         feature = request.args["feature"]
         featureName = db.getLabel(feature)
+        featureComment = db.getComment(feature)
+        properties = db.listObservableProperties(feature)
+        propInfos = []
+        for prop in properties:
+            propInfo = {}
+            propInfo["label"] = db.getLabel(prop)
+            propInfo["comment"] = db.getComment(prop)
+            qk, unit = db.getPropertyQuantityKindAndUnit(prop)
+            propInfo["qk"] = db.getLabel(qk)
+            propInfo["unit"] = db.getLabel(unit)
+            propInfos.append(propInfo)
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         return render_template(
             "feature.html",
             feature=feature,
             featureName=featureName,
+            featureComment=featureComment,
+            properties=propInfos,
             featureURLEncoded=featureURLEncoded,
             urllib=urllib,
         )
