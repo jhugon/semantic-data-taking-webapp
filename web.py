@@ -3,6 +3,7 @@ from flask import request
 from flask import render_template, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
+from flask_talisman import Talisman
 
 from db import DBInterface, DataValidationError, GetSubjectError, QUDT
 from flask_simple_login import (
@@ -14,6 +15,8 @@ from flask_simple_login import (
 
 import urllib
 from datetime import datetime
+import os
+import re
 import os.path
 import logging
 import sys
@@ -43,8 +46,12 @@ def create_app():
     app.config["PROXY_FORWARDING"] = True
 
     app.config["SERVER_NAME"] = "semweb.localhost"
-    app.config["SESSION_PROTECTION"] = "strong"
     app.config["SECRET_KEY"] = b"dummy"
+
+    app.config["PREFERRED_URL_SCHEME"] = "https"
+    app.config["SESSION_PROTECTION"] = "strong"
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
 
     ## override above with contents of file in this environment variable:
     try:
@@ -53,6 +60,10 @@ def create_app():
         app.logger.warning(e)
     ## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
     app.config.from_prefixed_env()
+    for k in os.environ:
+        rematch = re.match(r"^FLASK_(.*SECRET.*)",k)
+        if rematch:
+            app.logger.info(f"Configuration variable {rematch.group(1)} set from environment variable")
 
     ## Options if using built-in Flask debugging server
     if "RUN_FROM_CLI" in app.config and app.config["RUN_FROM_CLI"]:
@@ -66,6 +77,13 @@ def create_app():
 
     db = DBInterface(store_path=app.config["DB_STORE_PATH"],data_uri_base=app.config["DB_DATA_URI_BASE"],store_type=app.config["DB_STORE_TYPE"])
 
+    content_security_policy = {
+        "default-src": [
+            "'self'",
+            "cdn.jsdelivr.net",
+        ]
+    }
+    talisman = Talisman(app,content_security_policy=content_security_policy)
     app.register_blueprint(auth)
     login_manager = LoginManager()
     login_manager.login_view = "auth.login"
@@ -207,3 +225,8 @@ def create_app():
         return redirect(url_for("enterdata")+"?feature="+feature+"&"+"status=success")
 
     return app
+
+if __name__ == "__main__":
+    import os
+    os.environ["FLASK_SERVER_NAME"] = "semweb.localhost:5000"
+    create_app().run("0.0.0.0",debug=True,port=5000,ssl_context="adhoc")

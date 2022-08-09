@@ -13,9 +13,12 @@ services:
   reverse-proxy:
     build: ./nginx
     ports:
-      - "8080:80"
+      - "8080:443"
     environment:
       NGINX_HOSTNAME: semweb.localhost
+    volumes:
+      - ./certs/cert.pem:/certs/cert.pem
+      - ./certs/key.pem:/certs/key.pem
   db-server:
     build: ./jena-fuseki
     ports:

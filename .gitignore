@@ -133,3 +133,4 @@ dmypy.json
 userfile.txt
 web-db-store.bdb/
 jenadb/
+certs/
