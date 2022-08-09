@@ -15,6 +15,8 @@ from flask_simple_login import (
 
 import urllib
 from datetime import datetime
+import os
+import re
 import os.path
 import logging
 import sys
@@ -58,6 +60,10 @@ def create_app():
         app.logger.warning(e)
     ## override above with environment variables prefixed with "FLASK_" e.g. "FLASK_SERVER_NAME"
     app.config.from_prefixed_env()
+    for k in os.environ:
+        rematch = re.match(r"^FLASK_(.*SECRET.*)",k)
+        if rematch:
+            app.logger.info(f"Configuration variable {rematch.group(1)} set from environment variable")
 
     ## Options if using built-in Flask debugging server
     if "RUN_FROM_CLI" in app.config and app.config["RUN_FROM_CLI"]:
