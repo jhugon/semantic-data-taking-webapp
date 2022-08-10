@@ -291,7 +291,7 @@ def create_app():
                 feature,
                 datetime.now().astimezone().replace(microsecond=0).isoformat(),
                 user_uri,
-                "",
+                form["comment"],
                 form,
             )
         except DataValidationError as e:
