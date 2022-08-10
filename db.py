@@ -315,6 +315,9 @@ class DBInterface:
             self.data_graph.value(stimulus, self.SDTW.hasTime).value
             for stimulus in stimuli
         ]
+        stim_comments = [
+            self.data_graph.value(stimulus, RDFS.comment).value for stimulus in stimuli
+        ]
         data = []
         for stimulus in stimuli:
             stim_data = []
@@ -332,7 +335,7 @@ class DBInterface:
                             )
                 stim_data.append(val)
             data.append(stim_data)
-        return stim_times, data
+        return stim_times, data, stim_comments
 
     def enterData(self, feature, t, sensor, comment, datadict):
         """

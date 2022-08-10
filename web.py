@@ -208,13 +208,14 @@ def create_app():
         featureName = db.getLabel(feature)
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         props, headings = db.getColumnHeadings(feature)
-        stim_times, data = db.getData(feature)
+        stim_times, data, stim_comments = db.getData(feature)
         return render_template(
             "tableview.html",
             featureName=featureName,
             featureURLEncoded=featureURLEncoded,
             headings=headings,
             stim_times=stim_times,
+            stim_comments=stim_comments,
             data=data,
             zip=zip,
         )
