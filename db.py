@@ -380,7 +380,6 @@ class DBInterface:
             observation = self.convertToURIRef(observationURI)
             self.data_graph.add((stimulus, SSN.isProxyFor, prop))
             self.data_graph.add((observation, RDF.type, SOSA.Observation))
-            self.data_graph.set((observation, RDFS.comment, Literal(comment)))
             self.data_graph.set((observation, SOSA.madeBySensor, sensor))
             self.data_graph.set((observation, SSN.wasOriginatedBy, stimulus))
             self.data_graph.set((observation, SOSA.hasFeatureOfInterest, feature))
