@@ -286,6 +286,14 @@ class DBInterface:
         result = f"{label} [{unit_label}]"
         return result
 
+    def getPropertyQuantityKindAndUnit(self, observedProperty):
+        observedProperty = self.convertToURIRef(observedProperty)
+        quantityKind = list(
+            self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+        )[0][2]
+        unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[0][2]
+        return quantityKind, unit
+
     def getColumnHeadings(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))
@@ -307,6 +315,9 @@ class DBInterface:
             self.data_graph.value(stimulus, self.SDTW.hasTime).value
             for stimulus in stimuli
         ]
+        stim_comments = [
+            self.data_graph.value(stimulus, RDFS.comment).value for stimulus in stimuli
+        ]
         data = []
         for stimulus in stimuli:
             stim_data = []
@@ -324,7 +335,7 @@ class DBInterface:
                             )
                 stim_data.append(val)
             data.append(stim_data)
-        return stim_times, data
+        return stim_times, data, stim_comments
 
     def enterData(self, feature, t, sensor, comment, datadict):
         """
@@ -372,7 +383,6 @@ class DBInterface:
             observation = self.convertToURIRef(observationURI)
             self.data_graph.add((stimulus, SSN.isProxyFor, prop))
             self.data_graph.add((observation, RDF.type, SOSA.Observation))
-            self.data_graph.set((observation, RDFS.comment, Literal(comment)))
             self.data_graph.set((observation, SOSA.madeBySensor, sensor))
             self.data_graph.set((observation, SSN.wasOriginatedBy, stimulus))
             self.data_graph.set((observation, SOSA.hasFeatureOfInterest, feature))

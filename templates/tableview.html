@@ -18,17 +18,23 @@
             {{ heading }}
           </th>
         {% endfor %}
+        <th>
+            Comment
+        </th>
       </tr>
-      {% for stim_time, data_row in zip(stim_times,data) %}
+      {% for stim_time, data_row, stim_comment in zip(stim_times,data,stim_comments) %}
         <tr>
           <td>
             {{ stim_time }}
           </td>
-            {% for data_cell in data_row %}
-              <td>
-                {{ data_cell }}
-              </td>
-            {% endfor %}
+          {% for data_cell in data_row %}
+            <td>
+              {{ data_cell }}
+            </td>
+          {% endfor %}
+          <td>
+            {{ stim_comment }}
+          </td>
         </tr>
       {% endfor %}
     </table>

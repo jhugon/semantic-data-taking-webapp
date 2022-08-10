@@ -17,6 +17,12 @@
           <label for="{{ prop }}">{{ heading }}<label>
         </p>
       {% endfor %}
+      <p>
+        <label for="comment">Comment:</label>
+      <p>
+      </p>
+        <textarea id="comment "type="text" name="comment" rows="4" cols="45"></textarea>
+      </p>
       <input type="text" name="feature" value="{{feature}}" readonly hidden>
       <input type="submit" value="Submit" class="btn btn-primary">
     </form>
