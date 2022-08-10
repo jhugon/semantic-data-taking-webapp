@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.3.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.3.0) - 2022-08-09
+
+- [`c2fac84`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c2fac8479d91cc4bb354dc8ce975c33e6fde7a1c) Merge pull request #34 from jhugon/improve_comments
+- [`496f009`](https://github.com/jhugon/semantic-data-taking-webapp/commit/496f009244300958cb5d0cc038d48a8c6bf21416) feat: data table now shows comments (from stimuli)
+- [`5a59ac0`](https://github.com/jhugon/semantic-data-taking-webapp/commit/5a59ac0ff0bbccfe607117dacac3a198f39c920e) fix: only comment on stimuli, not observations
+- [`f7a3e94`](https://github.com/jhugon/semantic-data-taking-webapp/commit/f7a3e94961999ba6b82540addc786f0e0dc79367) feat: added comment field for data entry
+- [`b8467e8`](https://github.com/jhugon/semantic-data-taking-webapp/commit/b8467e8d7a74977755fc2969de9f671cf331feee) fix: property comments show up now
+- [`e165f59`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e165f591e7ed60a942b78bebb089910305ca6895) feat: Add comments and properties to feature page
+
 ## [v0.2.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.2.0) - 2022-08-09
 
 - [`0e7eced`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0e7eced0ef35293b3d26e301874c86faea27d9ff) feat: Dockerfile just install pkgs from Pipfile.lock
