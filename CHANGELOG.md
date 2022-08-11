@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v0.4.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.4.0) - 2022-08-11
+
+- [`c9024ce`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c9024ce998ec1f6263e7b3a31641260f1350b5ab) feat: add login session persistance
+
 ## [v0.3.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.3.0) - 2022-08-09
 
 - [`c2fac84`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c2fac8479d91cc4bb354dc8ce975c33e6fde7a1c) Merge pull request #34 from jhugon/improve_comments
