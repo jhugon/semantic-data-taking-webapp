@@ -14,7 +14,7 @@ from flask_simple_login import (
 
 
 import urllib
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import re
 import os.path
@@ -53,6 +53,11 @@ def create_app():
     app.config["SESSION_PROTECTION"] = "strong"
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
+
+    app.config["LOGIN_REMEMBER"] = True
+    app.config["REMEMBER_COOKIE_DURATION"] = timedelta(days=7)
+    app.config["REMEMBER_COOKIE_SECURE"] = True
+    app.config["REMEMBER_COOKIE_REFRESH_EACH_REQUEST"] = True
 
     ## override above with contents of file in this environment variable:
     try:
