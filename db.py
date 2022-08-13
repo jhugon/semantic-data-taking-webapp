@@ -228,9 +228,11 @@ class DBInterface:
         )
         return props
 
-    def addNewObservableProperty(self, label, comment, feature, quantityKind, unit):
+    def addNewObservableProperty(
+        self, label, proptype, comment, feature, quantityKind, unit
+    ):
         LOGGER.debug(
-            f"addNewObservableProperty: label: {label} feature: {feature} quantityKind: {quantityKind} unit: {unit}"
+            f"addNewObservableProperty: label: {label} proptype: {proptype} feature: {feature} quantityKind: {quantityKind} unit: {unit}"
         )
         feature = self.convertToURIRef(feature)
         featureName = self.getLabel(feature)
@@ -246,31 +248,46 @@ class DBInterface:
             raise ObservablePropertyExistsError(
                 f"Prop with label '{label}' and feature '{featureName}' is already in graph"
             )
-        quantityKind = self.convertToURIRef(quantityKind)
-        if (
-            len(
-                [
-                    quad
-                    for quad in self.triples(
-                        (quantityKind, RDF.type, QUDT.QuantityKind)
-                    )
-                ]
-            )
-            < 1
-        ):
-            raise DataValidationError(r"Quantity kind not found in database")
-        unit = self.convertToURIRef(unit)
-        if len([quad for quad in self.triples((unit, RDF.type, QUDT.Unit))]) < 1:
-            raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
-        self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
-        self.data_graph.set((prop, RDFS.label, label))
-        self.data_graph.set((prop, RDFS.comment, comment))
-        self.data_graph.set((prop, SSN.isPropertyOf, feature))
-        self.data_graph.set((prop, self.SDTW.hasQuantityKind, quantityKind))
-        self.data_graph.set((prop, self.SDTW.hasUnit, unit))
-        self.data_graph.commit()
+        match proptype:
+            case "quantitative":
+                quantityKind = self.convertToURIRef(quantityKind)
+                if (
+                    len(
+                        [
+                            quad
+                            for quad in self.triples(
+                                (quantityKind, RDF.type, QUDT.QuantityKind)
+                            )
+                        ]
+                    )
+                    < 1
+                ):
+                    raise DataValidationError(r"Quantity kind not found in database")
+                unit = self.convertToURIRef(unit)
+                if (
+                    len([quad for quad in self.triples((unit, RDF.type, QUDT.Unit))])
+                    < 1
+                ):
+                    raise DataValidationError(r"Unit not found in database")
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set((prop, self.SDTW.hasType, self.SDTW.quantitative))
+                self.data_graph.set((prop, self.SDTW.hasQuantityKind, quantityKind))
+                self.data_graph.set((prop, self.SDTW.hasUnit, unit))
+                self.data_graph.commit()
+            case "categorical":
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set((prop, self.SDTW.hasType, self.SDTW.categorical))
+                self.data_graph.commit()
+            case other:
+                raise ValueError(f"Unknown property type: {other}")
 
     def getPrettyTitle(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)

@@ -89,12 +89,13 @@ def create_app():
         store_type=app.config["DB_STORE_TYPE"],
     )
 
-    content_security_policy = {
-        "default-src": [
-            "'self'",
-            "cdn.jsdelivr.net",
-        ]
-    }
+    content_security_policy = None
+    # content_security_policy = {
+    #    "default-src": [
+    #        "'self'",
+    #        "cdn.jsdelivr.net",
+    #    ]
+    # }
     talisman = Talisman(app, content_security_policy=content_security_policy)
     app.register_blueprint(auth)
     login_manager = LoginManager()
@@ -190,6 +191,7 @@ def create_app():
     def selectpropertyunit():
         feature = request.args["feature"]
         propname = request.args["propname"]
+        proptype = request.args["proptype"]
         comment = request.args["comment"]
         quantityKind = request.args["quantitykind"]
         quantityKindLabel = db.getLabel(quantityKind)
@@ -200,6 +202,7 @@ def create_app():
             feature=feature,
             featureName=featureName,
             propname=propname,
+            proptype=proptype,
             comment=comment,
             quantityKind=quantityKind,
             quantityKindLabel=quantityKindLabel,
@@ -268,11 +271,18 @@ def create_app():
     def form_addproperty():
         feature = request.form["feature"]
         propname = request.form["propname"]
+        proptype = request.form["proptype"]
         comment = request.form["comment"]
         quantityKind = request.form["quantitykind"]
-        unit = request.form["unit"]
+        unit = None
         try:
-            db.addNewObservableProperty(propname, comment, feature, quantityKind, unit)
+            unit = request.form["unit"]
+        except KeyError:
+            pass
+        try:
+            db.addNewObservableProperty(
+                propname, proptype, comment, feature, quantityKind, unit
+            )
         except Exception as e:
             return redirect(
                 url_for("addproperty")
