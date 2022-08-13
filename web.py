@@ -144,9 +144,19 @@ def create_app():
             propInfo = {}
             propInfo["label"] = db.getLabel(prop)
             propInfo["comment"] = db.getComment(prop)
-            qk, unit = db.getPropertyQuantityKindAndUnit(prop)
-            propInfo["qk"] = db.getLabel(qk)
-            propInfo["unit"] = db.getLabel(unit)
+            proptype = db.getPropertyObservableType(prop)
+            match proptype:
+                case db.SDTW.quantitative:
+                    qk, unit = db.getPropertyQuantityKindAndUnit(prop)
+                    propInfo["qk"] = db.getLabel(qk)
+                    propInfo["unit"] = db.getLabel(unit)
+                case db.SDTW.categorical:
+                    propInfo["qk"] = "Categorical"
+                    propInfo["unit"] = ""
+                case _:
+                    raise ValueError(
+                        "Unkown property type: {proptype} for property: {prop}"
+                    )
             propInfos.append(propInfo)
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         return render_template(

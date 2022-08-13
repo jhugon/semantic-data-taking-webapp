@@ -275,7 +275,9 @@ class DBInterface:
                 self.data_graph.set((prop, RDFS.label, label))
                 self.data_graph.set((prop, RDFS.comment, comment))
                 self.data_graph.set((prop, SSN.isPropertyOf, feature))
-                self.data_graph.set((prop, self.SDTW.hasType, self.SDTW.quantitative))
+                self.data_graph.set(
+                    (prop, self.SDTW.hasObservableType, self.SDTW.quantitative)
+                )
                 self.data_graph.set((prop, self.SDTW.hasQuantityKind, quantityKind))
                 self.data_graph.set((prop, self.SDTW.hasUnit, unit))
                 self.data_graph.commit()
@@ -284,7 +286,9 @@ class DBInterface:
                 self.data_graph.set((prop, RDFS.label, label))
                 self.data_graph.set((prop, RDFS.comment, comment))
                 self.data_graph.set((prop, SSN.isPropertyOf, feature))
-                self.data_graph.set((prop, self.SDTW.hasType, self.SDTW.categorical))
+                self.data_graph.set(
+                    (prop, self.SDTW.hasObservableType, self.SDTW.categorical)
+                )
                 self.data_graph.commit()
             case other:
                 raise ValueError(f"Unknown property type: {other}")
@@ -303,13 +307,54 @@ class DBInterface:
         result = f"{label} [{unit_label}]"
         return result
 
+    def getPropertyObservableType(self, observedProperty):
+        observedProperty = self.convertToURIRef(observedProperty)
+        trps = list(self.triples((observedProperty, self.SDTW.hasObservableType, None)))
+        LOGGER.info(f"{observedProperty} hasObservableType {[x[2] for x in trps]}")
+        match trps:
+            case []:
+                LOGGER.info(
+                    f"Property {observedProperty} has no ObservableType, assuming quantitative"
+                )
+                return self.SDTW.quantitative
+            case [(s, p, o)]:
+                return o
+            case _:
+                raise ValueError(
+                    f"Property {observedProperty} has more than one ObservableType: {trips}"
+                )
+
     def getPropertyQuantityKindAndUnit(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
-        quantityKind = list(
-            self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
-        )[0][2]
-        unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[0][2]
-        return quantityKind, unit
+        trps = list(self.triples((observedProperty, self.SDTW.hasObservableType, None)))
+        match trps:
+            case []:
+                LOGGER.info(
+                    f"Property {observedProperty} has no ObservableType, assuming quantitative"
+                )
+                quantityKind = list(
+                    self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+                )[0][2]
+                unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[
+                    0
+                ][2]
+                return quantityKind, unit
+            case [(s, p, self.SDTW.quantitative)]:
+                quantityKind = list(
+                    self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+                )[0][2]
+                unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[
+                    0
+                ][2]
+                return quantityKind, unit
+            case [(s, p, self.SDTW.categorical)]:
+                raise ValueError(
+                    f"Property {observedProperty} is categorical, there are no QK or units"
+                )
+            case _:
+                raise ValueError(
+                    f"Property {observedProperty} has more than one ObservableType: {trips}"
+                )
 
     def getColumnHeadings(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
