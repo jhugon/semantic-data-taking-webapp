@@ -10,30 +10,43 @@
   <main>
     <form action="form/adddata" method="post">
       {% for propheading in propheadings %}
-      {% set prop=propheading[0] %}
-      {% set heading=propheading[1] %}
-        <p>
-          <input type="text" id="{{ prop }}" name="{{ prop }}">
-          <label for="{{ prop }}">{{ heading }}<label>
-        </p>
+        {% set prop=propheading[0] %}
+        {% set heading=propheading[1] %}
+        {% set categories=propheading[2] %}
+        {% if categories is none %}
+          <div>
+            <input type="text" id="{{ prop }}" name="{{ prop }}">
+            <label for="{{ prop }}">{{ heading }}<label>
+          </div>
+        {% else %}
+          <div>
+            <input type="text" id="{{ prop }}" name="{{ prop }}" list="{{heading}}_list">
+            <datalist id="{{heading}}_list">
+              {% for category in categories %}
+                <option>{{ category }}</option>
+              {% endfor %}
+            </datalist>
+            <label for="{{ prop }}">{{ heading }} (categories so far: {{ ", ".join(categories) }})<label>
+          </div>
+        {% endif %}
       {% endfor %}
-      <p>
+      <div>
         <label for="comment">Comment:</label>
-      <p>
-      </p>
+      <div>
+      </div>
         <textarea id="comment "type="text" name="comment" rows="4" cols="45"></textarea>
-      </p>
+      </div>
       <input type="text" name="feature" value="{{feature}}" readonly hidden>
       <input type="submit" value="Submit" class="btn btn-primary">
     </form>
     {% if status == "success" %}
-    <p>
+    <div>
       Successful Submission
-    </p>
+    </div>
     {% endif %}
     {% if status == "error" %}
-    <p>
+    <div>
       Error: {{ reason }}
-    </p>
+    </div>
     {% endif %}
 {% endblock %}

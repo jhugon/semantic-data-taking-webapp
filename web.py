@@ -255,7 +255,10 @@ def create_app():
         featureName = db.getLabel(feature)
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         props, headings = db.getColumnHeadings(feature)
-        propheadings = list(zip([str(prop) for prop in props], headings))
+        categories = []
+        for prop in props:
+            categories.append(db.getCategories(prop))
+        propheadings = list(zip([str(prop) for prop in props], headings, categories))
         return render_template(
             "enterdata.html",
             featureName=featureName,
