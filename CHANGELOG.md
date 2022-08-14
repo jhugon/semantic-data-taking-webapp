@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.0.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.0.0) - 2022-08-13
+
+- [`392a74c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/392a74ce63c8dab6c6ffeee21d2a330bfa918a9c) Merge pull request #39 from jhugon/category_properties
+- [`a3f6861`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a3f6861a6b249ce2de084b01c63c19d35d6fe613) feat: table view categories working now
+- [`8e6c7cf`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8e6c7cfff6cb0cd73573183894c25439ecb984fa) feat: categories work in data entry
+- [`8cd057d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8cd057d2605f6c89b489b6a413aaccd24bc4d36b) feat: now categorical shows up on feature page
+- [`f1cb542`](https://github.com/jhugon/semantic-data-taking-webapp/commit/f1cb542b64e21610e0b0f8bb95e181ace30bc52b) feat!: can now add categorical properties
+
 ## [v0.4.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v0.4.0) - 2022-08-11
 
 - [`c9024ce`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c9024ce998ec1f6263e7b3a31641260f1350b5ab) feat: add login session persistance
