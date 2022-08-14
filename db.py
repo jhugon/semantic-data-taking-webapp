@@ -228,9 +228,11 @@ class DBInterface:
         )
         return props
 
-    def addNewObservableProperty(self, label, comment, feature, quantityKind, unit):
+    def addNewObservableProperty(
+        self, label, proptype, comment, feature, quantityKind, unit
+    ):
         LOGGER.debug(
-            f"addNewObservableProperty: label: {label} feature: {feature} quantityKind: {quantityKind} unit: {unit}"
+            f"addNewObservableProperty: label: {label} proptype: {proptype} feature: {feature} quantityKind: {quantityKind} unit: {unit}"
         )
         feature = self.convertToURIRef(feature)
         featureName = self.getLabel(feature)
@@ -246,53 +248,123 @@ class DBInterface:
             raise ObservablePropertyExistsError(
                 f"Prop with label '{label}' and feature '{featureName}' is already in graph"
             )
-        quantityKind = self.convertToURIRef(quantityKind)
-        if (
-            len(
-                [
-                    quad
-                    for quad in self.triples(
-                        (quantityKind, RDF.type, QUDT.QuantityKind)
-                    )
-                ]
-            )
-            < 1
-        ):
-            raise DataValidationError(r"Quantity kind not found in database")
-        unit = self.convertToURIRef(unit)
-        if len([quad for quad in self.triples((unit, RDF.type, QUDT.Unit))]) < 1:
-            raise DataValidationError(r"Unit not found in database")
         label = Literal(label)
         comment = Literal(comment)
-        self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
-        self.data_graph.set((prop, RDFS.label, label))
-        self.data_graph.set((prop, RDFS.comment, comment))
-        self.data_graph.set((prop, SSN.isPropertyOf, feature))
-        self.data_graph.set((prop, self.SDTW.hasQuantityKind, quantityKind))
-        self.data_graph.set((prop, self.SDTW.hasUnit, unit))
-        self.data_graph.commit()
+        match proptype:
+            case "quantitative":
+                quantityKind = self.convertToURIRef(quantityKind)
+                if (
+                    len(
+                        [
+                            quad
+                            for quad in self.triples(
+                                (quantityKind, RDF.type, QUDT.QuantityKind)
+                            )
+                        ]
+                    )
+                    < 1
+                ):
+                    raise DataValidationError(r"Quantity kind not found in database")
+                unit = self.convertToURIRef(unit)
+                if (
+                    len([quad for quad in self.triples((unit, RDF.type, QUDT.Unit))])
+                    < 1
+                ):
+                    raise DataValidationError(r"Unit not found in database")
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set(
+                    (prop, self.SDTW.hasObservableType, self.SDTW.quantitative)
+                )
+                self.data_graph.set((prop, self.SDTW.hasQuantityKind, quantityKind))
+                self.data_graph.set((prop, self.SDTW.hasUnit, unit))
+                self.data_graph.commit()
+            case "categorical":
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set(
+                    (prop, self.SDTW.hasObservableType, self.SDTW.categorical)
+                )
+                self.data_graph.commit()
+            case other:
+                raise ValueError(f"Unknown property type: {other}")
 
     def getPrettyTitle(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         label = self.getLabel(observedProperty)
-        unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[0][2]
-        unit_symbols = list(self.triples((unit, QUDT.symbol, None)))
-        unit_ucumCode = list(self.triples((unit, QUDT.ucumCode, None)))
-        unit_label = self.getLabel(unit)
-        if len(unit_symbols) > 0:
-            unit_label = unit_symbols[0][2]
-        elif len(unit_ucumCode) > 0:
-            unit_label = unit_ucumCode[0][2]
-        result = f"{label} [{unit_label}]"
-        return result
+        proptype = self.getPropertyObservableType(observedProperty)
+        match proptype:
+            case self.SDTW.quantitative:
+                unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[
+                    0
+                ][2]
+                unit_symbols = list(self.triples((unit, QUDT.symbol, None)))
+                unit_ucumCode = list(self.triples((unit, QUDT.ucumCode, None)))
+                unit_label = self.getLabel(unit)
+                if len(unit_symbols) > 0:
+                    unit_label = unit_symbols[0][2]
+                elif len(unit_ucumCode) > 0:
+                    unit_label = unit_ucumCode[0][2]
+                result = f"{label} [{unit_label}]"
+                return result
+            case self.SDTW.categorical:
+                result = f"{label}"
+                return result
+            case other:
+                raise ValueError(f"Unknown property type: {other}")
+
+    def getPropertyObservableType(self, observedProperty):
+        observedProperty = self.convertToURIRef(observedProperty)
+        trps = list(self.triples((observedProperty, self.SDTW.hasObservableType, None)))
+        LOGGER.info(f"{observedProperty} hasObservableType {[x[2] for x in trps]}")
+        match trps:
+            case []:
+                LOGGER.info(
+                    f"Property {observedProperty} has no ObservableType, assuming quantitative"
+                )
+                return self.SDTW.quantitative
+            case [(s, p, o)]:
+                return o
+            case _:
+                raise ValueError(
+                    f"Property {observedProperty} has more than one ObservableType: {trips}"
+                )
 
     def getPropertyQuantityKindAndUnit(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
-        quantityKind = list(
-            self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
-        )[0][2]
-        unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[0][2]
-        return quantityKind, unit
+        trps = list(self.triples((observedProperty, self.SDTW.hasObservableType, None)))
+        match trps:
+            case []:
+                LOGGER.info(
+                    f"Property {observedProperty} has no ObservableType, assuming quantitative"
+                )
+                quantityKind = list(
+                    self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+                )[0][2]
+                unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[
+                    0
+                ][2]
+                return quantityKind, unit
+            case [(s, p, self.SDTW.quantitative)]:
+                quantityKind = list(
+                    self.triples((observedProperty, self.SDTW.hasQuantityKind, None))
+                )[0][2]
+                unit = list(self.triples((observedProperty, self.SDTW.hasUnit, None)))[
+                    0
+                ][2]
+                return quantityKind, unit
+            case [(s, p, self.SDTW.categorical)]:
+                raise ValueError(
+                    f"Property {observedProperty} is categorical, there are no QK or units"
+                )
+            case _:
+                raise ValueError(
+                    f"Property {observedProperty} has more than one ObservableType: {trips}"
+                )
 
     def getColumnHeadings(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
@@ -303,6 +375,7 @@ class DBInterface:
     def getData(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))
+        proptypes = [self.getPropertyObservableType(prop) for prop in props]
         stimuli = set()
         for prop in props:
             for stimulus in self.data_graph.subjects(SSN.isProxyFor, prop):
@@ -322,13 +395,23 @@ class DBInterface:
         for stimulus in stimuli:
             stim_data = []
             observations = list(self.data_graph.subjects(SSN.wasOriginatedBy, stimulus))
-            for prop in props:
+            for prop, proptype in zip(props, proptypes):
                 val = None
                 for observation in observations:
                     if (observation, SOSA.observedProperty, prop) in self.data_graph:
                         if val is None:
-                            res = self.data_graph.value(observation, SOSA.hasResult)
-                            val = self.data_graph.value(res, QUDT.value).value
+                            match proptype:
+                                case self.SDTW.quantitative:
+                                    res = self.data_graph.value(
+                                        observation, SOSA.hasResult
+                                    )
+                                    val = self.data_graph.value(res, QUDT.value).value
+                                case self.SDTW.categorical:
+                                    val = self.data_graph.value(
+                                        observation, SOSA.hasResult
+                                    )
+                                case other:
+                                    raise ValueError(f"Unknown property type: {other}")
                         else:
                             print(
                                 f"Warning: {stimulus} {prop} has more than one observation!"
@@ -369,13 +452,6 @@ class DBInterface:
                 continue
             if re.match(r"^\s*$", datum):
                 continue
-            try:
-                datum = float(datum)
-            except ValueError as e:
-                raise DataValidationError(e)
-            except TypeError as e:
-                raise DataValidationError(e)
-            unit = self.data_graph.value(prop, self.SDTW.hasUnit)
             propName = self.getLabel(prop)
             observationURI = os.path.join(
                 self.data_uri_base, "observations", featureName, propName, t
@@ -390,13 +466,50 @@ class DBInterface:
             self.data_graph.set(
                 (observation, SOSA.resultTime, Literal(t, datatype=XSD.dateTime))
             )
-            res = BNode()
-            self.data_graph.set((observation, SOSA.hasResult, res))
-            self.data_graph.set((res, RDF.type, SOSA.Result))
-            self.data_graph.set((res, RDF.type, QUDT.Quantity))
-            self.data_graph.set((res, QUDT.value, Literal(datum)))
-            self.data_graph.set((res, QUDT.unit, unit))
+            proptype = self.getPropertyObservableType(prop)
+            match proptype:
+                case self.SDTW.quantitative:
+                    try:
+                        datum = float(datum)
+                    except ValueError as e:
+                        raise DataValidationError(e)
+                    except TypeError as e:
+                        raise DataValidationError(e)
+                    unit = self.data_graph.value(prop, self.SDTW.hasUnit)
+                    res = BNode()
+                    self.data_graph.set((observation, SOSA.hasResult, res))
+                    self.data_graph.set((res, RDF.type, SOSA.Result))
+                    self.data_graph.set((res, RDF.type, QUDT.Quantity))
+                    self.data_graph.set((res, QUDT.value, Literal(datum)))
+                    self.data_graph.set((res, QUDT.unit, unit))
+                case self.SDTW.categorical:
+                    self.data_graph.set((observation, SOSA.hasResult, Literal(datum)))
+                case other:
+                    raise ValueError(f"property {prop} type not recognized: {other}")
         self.data_graph.commit()
+
+    def getCategories(self, observedProperty):
+        observedProperty = self.convertToURIRef(observedProperty)
+        proptype = self.getPropertyObservableType(observedProperty)
+        if proptype != self.SDTW.categorical:
+            return None
+        else:
+            category_query = f"""
+            prefix sosa: <http://www.w3.org/ns/sosa/>
+            select ?category
+            from <{self.data_uri_base}>
+            where {{
+                ?observation sosa:observedProperty {observedProperty.n3()} .
+                ?observation sosa:hasResult ?category .
+            }}"""  # nosec
+
+            LOGGER.info(category_query)
+            qres = self.dataset.query(category_query)
+            result = set()
+            for row in qres:
+                result.add(row.category.value)
+            LOGGER.info(f"Categories: {result}")
+            return list(result)
 
     def get_quantity_kind_list(self):
         return self.quantity_kind_and_label_list

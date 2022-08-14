@@ -23,12 +23,13 @@
         Property Name: {{propname}}
       </p>
       <p>
-        Description: {{comment}}
+        Comment: {{comment}}
       </p>
-      <input type="text" id="propname" name="propname" value="{{propname}}" readonly hidden>
-      <input type="text" id="quantitykind" name="quantitykind" value="{{quantityKind}}" readonly hidden>
-      <input name="comment" id="comment" value="{{comment}}" readonly hidden>
-      <input type="text" name="feature" value="{{feature}}" readonly hidden>
+      <input name="propname" value="{{propname}}" readonly hidden>
+      <input name="proptype" value="{{proptype}}" readonly hidden>
+      <input name="quantitykind" value="{{quantityKind}}" readonly hidden>
+      <input name="comment" value="{{comment}}" readonly hidden>
+      <input name="feature" value="{{feature}}" readonly hidden>
       <input type="submit" value="Submit" class="btn btn-primary">
     </form>
 {% endblock %}

@@ -7,37 +7,68 @@
   <h2>
     Add Property to {{ featureName }} Feature
   </h2>
-    <form action="selectpropertyunit" method="get">
-      <p>
+    {# <form action="selectpropertyunit" method="get"> #}
+    <form onsubmit="addpropertyonsubmit(event)">
+      <div>
         <label for="propname">Property Name:</label>
         <input type="text" id="propname" name="propname" pattern="^[a-zA-Z0-9_]+$" title="Must be at least one number, letter or _" >
-      </p>
-      <p>
-        <label for="quantitykind">Kind of Quantity:</label>
+      </div>
+      <div>
+        <div>
+          Property Type:
+        </div>
+        <div>
+          <input type="radio" name="proptype" id="quantitative" value="quantitative" checked>
+          <label for="quantitative">Quantitative</label>
+        </div>
+        <div>
+          <input type="radio" name="proptype" id="categorical" value="categorical">
+          <label for="categorical">Catagorical</label>
+        </div>
+      </div>
+      <div>
+        <label for="quantitykind">Kind of Quantity (<em>only used for quantitative</em>):</label>
         <select id="quantitykind" name="quantitykind">
           {% for qk in quantity_kind_list %}
             <option value="{{qk[0]}}">{{qk[1]}}</option>
           {% endfor %}
         </select>
         <em>Use Dimensionless [Unitless] for non-dimensioned, and Currency for money</em>
-      </p>
-      <p>
+      </div>
+      <div>
         <label for="comment">Comment:</label>
-      </p>
-      <p>
+      </div>
+      <div>
         <textarea name="comment" id="comment" rows="4" cols="45"></textarea>
-      </p>
+      </div>
       <input type="text" name="feature" value="{{feature}}" readonly hidden>
       <input type="submit" value="Submit" class="btn btn-primary">
     </form>
     {% if status == "success" %}
-    <p>
+    <div>
       Successful Submission
-    </p>
+    </div>
     {% endif %}
     {% if status == "error" %}
-    <p>
+    <div>
       Error: {{ reason }}
-    </p>
+    </div>
     {% endif %}
+
+    <script type = "text/javascript">
+        function addpropertyonsubmit(evt) {
+            const form = evt.target;
+            const proptype = form["proptype"].value;
+            if (proptype == "quantitative") {
+                form.action = "/selectpropertyunit"
+                form.method = "GET";
+                form.onsubmit = null;
+            } else if (proptype == "categorical") {
+                form.action = "/form/addproperty"
+                form.method = "POST";
+                form.onsubmit = null;
+            }
+            return true;
+        }
+    </script>
 {% endblock %}

@@ -36,6 +36,15 @@ Ontology(<http://ontology.hugonlabs.com/sdtw#>
 
   ##########################################
 
+  Declaration(Class(:ObservableType))
+  Declaration(NamedIndividual(:categorical))
+  Declaration(NamedIndividual(:quantitative))
+  ClassAssertion(:ObservableType :categorical)
+  ClassAssertion(:ObservableType :quantitative)
+  DifferentIndividuals(:categorical :quantitative)
+
+  ##########################################
+
   Declaration(ObjectProperty(:hasTime))
   ObjectPropertyDomain(:hasTime ssn:Stimulus )
   ObjectPropertyRange( :hasTime xsd:dateTime )
@@ -47,4 +56,8 @@ Ontology(<http://ontology.hugonlabs.com/sdtw#>
   Declaration(ObjectProperty(:hasUnit))
   ObjectPropertyDomain(:hasUnit sosa:ObservableProperty )
   ObjectPropertyRange( :hasUnit qudt:Unit )
+
+  Declaration(ObjectProperty(:hasObservableType))
+  ObjectPropertyDomain(:hasObservableType sosa:ObservableProperty )
+  ObjectPropertyRange( :hasObservableType :ObservableType )
 )
