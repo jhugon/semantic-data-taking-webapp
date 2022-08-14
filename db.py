@@ -375,6 +375,7 @@ class DBInterface:
     def getData(self, featureOfInterest):
         featureOfInterest = self.convertToURIRef(featureOfInterest)
         props = list(self.listObservableProperties(featureOfInterest))
+        proptypes = [self.getPropertyObservableType(prop) for prop in props]
         stimuli = set()
         for prop in props:
             for stimulus in self.data_graph.subjects(SSN.isProxyFor, prop):
@@ -394,13 +395,23 @@ class DBInterface:
         for stimulus in stimuli:
             stim_data = []
             observations = list(self.data_graph.subjects(SSN.wasOriginatedBy, stimulus))
-            for prop in props:
+            for prop, proptype in zip(props, proptypes):
                 val = None
                 for observation in observations:
                     if (observation, SOSA.observedProperty, prop) in self.data_graph:
                         if val is None:
-                            res = self.data_graph.value(observation, SOSA.hasResult)
-                            val = self.data_graph.value(res, QUDT.value).value
+                            match proptype:
+                                case self.SDTW.quantitative:
+                                    res = self.data_graph.value(
+                                        observation, SOSA.hasResult
+                                    )
+                                    val = self.data_graph.value(res, QUDT.value).value
+                                case self.SDTW.categorical:
+                                    val = self.data_graph.value(
+                                        observation, SOSA.hasResult
+                                    )
+                                case other:
+                                    raise ValueError(f"Unknown property type: {other}")
                         else:
                             print(
                                 f"Warning: {stimulus} {prop} has more than one observation!"
