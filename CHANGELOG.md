@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.0.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.0.1) - 2022-08-16
+
+- [`882d836`](https://github.com/jhugon/semantic-data-taking-webapp/commit/882d8365e762ee3f7ddd6c39824b3421b73e5774) fix(docker): only bind directories, not files
+
 ## [v1.0.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.0.0) - 2022-08-13
 
 - [`392a74c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/392a74ce63c8dab6c6ffeee21d2a330bfa918a9c) Merge pull request #39 from jhugon/category_properties
