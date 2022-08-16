@@ -19,8 +19,7 @@ services:
     environment:
       NGINX_HOSTNAME: semweb.localhost
     volumes:
-      - ./certs/cert.pem:/certs/cert.pem
-      - ./certs/key.pem:/certs/key.pem
+      - ./certs/:/certs/
     depends_on:
       - semantic-app
   db-server:
