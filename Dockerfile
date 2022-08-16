@@ -26,7 +26,6 @@ RUN ls -l flask-simple-login
 RUN python -m pip install --upgrade pip
 RUN pip install pipenv
 RUN pipenv sync
-RUN pipenv run pip install gunicorn
 
 # Do this after pip so earlier steps can be cached by Docker
 COPY ontology ontology

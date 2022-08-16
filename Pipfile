@@ -11,6 +11,7 @@ httpx = "*"
 flask-talisman = "*"
 cryptography = "*"
 berkeleydb = "*"
+gunicorn = "*"
 
 [dev-packages]
 black = "*"
