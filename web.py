@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request
+from flask import request, Response
 from flask import render_template, redirect, url_for
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
@@ -335,6 +335,13 @@ def create_app():
         return redirect(
             url_for("enterdata") + "?feature=" + feature + "&" + "status=success"
         )
+
+    @app.route("/download/csv")
+    @login_required
+    def download_csv():
+        feature = request.args["feature"]
+        csv_data = db.getCSV(feature)
+        return Response(csv_data, mimetype="text/csv")
 
     return app
 

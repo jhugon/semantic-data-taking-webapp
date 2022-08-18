@@ -19,7 +19,7 @@ forms. The entered data can then be viewed in tables.
     docker compose up --build
     ```
 
-The app should be visible at `https://semweb.localhost:8080`
+The app should be visible at https://semweb.localhost:8080
 
 ## Run Test Server
 

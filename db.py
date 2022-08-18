@@ -8,6 +8,8 @@ import logging
 import berkeleydb
 import httpx
 import time
+from io import StringIO
+import csv
 
 LOGGER = logging.getLogger(__name__)
 # LOGGER.setLevel(logging.DEBUG)
@@ -487,6 +489,20 @@ class DBInterface:
                 case other:
                     raise ValueError(f"property {prop} type not recognized: {other}")
         self.data_graph.commit()
+
+    def getCSV(self, feature):
+        feature = self.convertToURIRef(feature)
+        props, headings = self.getColumnHeadings(feature)
+        stim_times, data, stim_comments = self.getData(feature)
+        result = ""
+        strfile = StringIO()
+        csvwriter = csv.writer(strfile)
+        csvwriter.writerow(("Timestamp", *headings, "Comment"))
+        for stim_time, data_row, stim_comment in zip(stim_times, data, stim_comments):
+            row = (stim_time, *data_row, stim_comment)
+            csvwriter.writerow(row)
+        result = strfile.getvalue()
+        return result
 
     def getCategories(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
