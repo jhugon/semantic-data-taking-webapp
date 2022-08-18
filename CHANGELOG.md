@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.1.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.1.0) - 2022-08-18
+
+- [`c6bd973`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c6bd97339c134a261cbcb91132520aab6f5ac57f) feat: Add button to download all RDF data
+- [`2aa7a6e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/2aa7a6edce4fd26e6cdeebb41ea437816915556f) feat: Added download CSV to feature page
+- [`89e702c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/89e702c892f427a124ef06eb50c2b60d94eb3822) build: put gunicorn in Pipfile
+
 ## [v1.0.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.0.1) - 2022-08-16
 
 - [`882d836`](https://github.com/jhugon/semantic-data-taking-webapp/commit/882d8365e762ee3f7ddd6c39824b3421b73e5774) fix(docker): only bind directories, not files
