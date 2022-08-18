@@ -343,6 +343,12 @@ def create_app():
         csv_data = db.getCSV(feature)
         return Response(csv_data, mimetype="text/csv")
 
+    @app.route("/download/rdf/semweb")
+    @login_required
+    def download_rdf():
+        rdf_data = db.getDataRDF()
+        return Response(rdf_data, mimetype="text/turtle")
+
     return app
 
 

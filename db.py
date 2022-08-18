@@ -504,6 +504,12 @@ class DBInterface:
         result = strfile.getvalue()
         return result
 
+    def getDataRDF(self):
+        """
+        Downloads whole data graph in Turtle format
+        """
+        return graph_store_get(self.store_path, graph_uri=self.data_uri_base)
+
     def getCategories(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         proptype = self.getPropertyObservableType(observedProperty)
@@ -665,6 +671,24 @@ def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
     headers["Content-Type"] = content_type
     response = httpx.post(url, params=params, headers=headers, data=rdftext)
     response.raise_for_status()
+
+
+def graph_store_get(url, graph_uri=None, content_type="text/turtle"):
+    """
+    url is the location of the server's graph store get endpoint
+    graph_uri is the named graph to get, None for default
+    """
+
+    params = {}
+    if graph_uri is None:
+        params["default"] = None
+    else:
+        params["graph"] = graph_uri
+    headers = {}
+    headers["Content-Type"] = content_type
+    response = httpx.get(url, params=params, headers=headers)
+    response.raise_for_status()
+    return response.text
 
 
 if __name__ == "__main__":
