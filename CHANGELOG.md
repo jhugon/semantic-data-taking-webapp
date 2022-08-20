@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.3.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.3.1) - 2022-08-20
+
+- [`c42c25e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c42c25e9694ecb1a8c85f1b6083e453394655494) fix(uplift): added .uplift.yml to manage bumping ver
+
 ## [v1.3.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.3.0) - 2022-08-20
 
 - [`58975a1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/58975a1dc279d5cb08431c478c6747595fa6926e) feat: added version to navbar
