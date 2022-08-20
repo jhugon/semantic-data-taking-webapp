@@ -12,7 +12,7 @@ from io import StringIO
 import csv
 
 LOGGER = logging.getLogger(__name__)
-# LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
@@ -85,8 +85,6 @@ class DBInterface:
                 break
         self.build_quantity_kind_list()
 
-        # self.data_graph.serialize(destination="debug.ttl")
-
         self.SDTW = Namespace("http://ontology.hugonlabs.com/sdtw#")
 
     def __del__(self):
@@ -106,7 +104,6 @@ class DBInterface:
             return URIRef(x)
 
     def triples(self, quad_or_triple):
-        LOGGER.debug(f"Getting triples for {quad_or_triple}")
         if len(quad_or_triple) == 3 or (
             len(quad_or_triple) == 4 and quad_or_triple[3] is None
         ):
@@ -160,16 +157,13 @@ class DBInterface:
 
     def getSubjectLabeledWithType(self, label, typ, label_lang=None, graph_name=None):
         label2 = Literal(label, lang=label_lang)
-        LOGGER.debug(f"label2: {label2}")
         subjects = list(graph.subjects(RDFS.label, label2))
         subjects = []
         labelFound = False
-        LOGGER.debug(f"graph_name: {graph_name}")
         for s, p, o, c in self.quads((None, RDFS.label, label2, graph_name)):
             labelFound = True
             if (s, RDF.type, typ, c) in self.dataset:
                 subjects.append(s)
-        LOGGER.debug(f"subjects: {subjects}")
         ### Note that graph_name None means search all graphs!
         if len(subjects) < 1:
             if labelFound:
@@ -322,10 +316,10 @@ class DBInterface:
     def getPropertyObservableType(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
         trps = list(self.triples((observedProperty, self.SDTW.hasObservableType, None)))
-        LOGGER.info(f"{observedProperty} hasObservableType {[x[2] for x in trps]}")
+        LOGGER.debug(f"{observedProperty} hasObservableType {[x[2] for x in trps]}")
         match trps:
             case []:
-                LOGGER.info(
+                LOGGER.debug(
                     f"Property {observedProperty} has no ObservableType, assuming quantitative"
                 )
                 return self.SDTW.quantitative
@@ -491,6 +485,7 @@ class DBInterface:
         ## Funny business with tmp_graph to only do one submission to DB rather than tons
         ## Very significant performance improvement
         tmp_graph_ttl = tmp_graph.serialize(format="ttl")
+        LOGGER.debug(tmp_graph_ttl)
         graph_store_post(self.store_path, tmp_graph_ttl, graph_uri=self.data_uri_base)
 
     def getCSV(self, feature):
@@ -528,12 +523,10 @@ class DBInterface:
                 ?observation sosa:hasResult ?category .
             }}"""  # nosec
 
-            LOGGER.debug(category_query)
             qres = self.dataset.query(category_query)
             result = set()
             for row in qres:
                 result.add(row.category.value)
-            LOGGER.info(f"Categories: {result}")
             return list(result)
 
     def get_quantity_kind_list(self):
