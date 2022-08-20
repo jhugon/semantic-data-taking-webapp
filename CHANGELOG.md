@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.2.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.2.0) - 2022-08-20
+
+- [`8cd88cc`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8cd88cca600f709306a3924ccc935b13a9c790a9) Merge pull request #43 from jhugon/speed-up-adddata
+- [`c62e662`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c62e662dcf4fcc3853b5add0666924efd9159608) perf: submit data now done with a single DB transaction
+- [`3cf8a35`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3cf8a350169b85984fb7c487fa206aaf736359da) feat: add cmd line option to web.py for profiling
+
 ## [v1.1.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.1.0) - 2022-08-18
 
 - [`c6bd973`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c6bd97339c134a261cbcb91132520aab6f5ac57f) feat: Add button to download all RDF data
