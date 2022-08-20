@@ -1,0 +1,5 @@
+bumps:
+  - file: ./templates/base.html
+    regex:
+        - pattern: "<span class=swversion>$VERSION</span>"
+          semver: true
