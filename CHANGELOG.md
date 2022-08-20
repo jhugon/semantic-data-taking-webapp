@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.2.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.2.1) - 2022-08-20
+
+- [`acae939`](https://github.com/jhugon/semantic-data-taking-webapp/commit/acae939cbb9a62a44997070061294133a6c3c917) fix: fix DB getData bug introduced in c62e662dcf
+- [`e78cc9c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e78cc9c621f1764dc3db585a28aacebb2fa78ea8) chore: got rid of uneccesary logging class in db.py
+
 ## [v1.2.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.2.0) - 2022-08-20
 
 - [`8cd88cc`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8cd88cca600f709306a3924ccc935b13a9c790a9) Merge pull request #43 from jhugon/speed-up-adddata
