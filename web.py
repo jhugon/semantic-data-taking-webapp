@@ -354,6 +354,20 @@ def create_app():
 
 if __name__ == "__main__":
     import os
+    import argparse
+    from werkzeug.middleware.profiler import ProfilerMiddleware
+
+    parser = argparse.ArgumentParser(
+        description="Test server for Semantic Data Taking Webapp"
+    )
+    parser.add_argument(
+        "-p", "--profiler", action="store_true", help="Enable profiler for all calls"
+    )
+    args = parser.parse_args()
 
     os.environ["FLASK_SERVER_NAME"] = "semweb.localhost:5000"
-    create_app().run("0.0.0.0", debug=True, port=5000, ssl_context="adhoc")  # nosec
+    app = create_app()
+    if args.profiler:
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app)
+        print("Warning: Profiling enabled")
+    app.run("0.0.0.0", debug=True, port=5000, ssl_context="adhoc")  # nosec

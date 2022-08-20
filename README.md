@@ -60,6 +60,18 @@ pre-commit install
 pre-commit install --hook-type commit-msg
 ```
 
+You may have to do run this as well to get pre-commit to work with your python:
+
+```bash
+pipenv run pip install -U pre-commit black
+```
+
+and this before every commit:
+
+```bash
+pipenv run pre-commit run --all
+```
+
 ## Example Scenario
 
 A simple example of usage would be to collect data on the fuel economy of a

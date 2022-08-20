@@ -1,4 +1,4 @@
-from rdflib import Dataset, ConjunctiveGraph, Namespace, URIRef, BNode, Literal
+from rdflib import Dataset, Graph, Namespace, URIRef, BNode, Literal
 from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
 from rdflib.store import NO_STORE, VALID_STORE
 from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore, _node_to_sparql
@@ -440,11 +440,10 @@ class DBInterface:
             self.data_uri_base, "stimuli", featureName.lower(), t.upper()
         )
         stimulus = self.convertToURIRef(stimulusURI)
-        self.data_graph.add((stimulus, RDF.type, SSN.Stimulus))
-        self.data_graph.set((stimulus, RDFS.comment, Literal(comment)))
-        self.data_graph.set(
-            (stimulus, self.SDTW.hasTime, Literal(t, datatype=XSD.dateTime))
-        )
+        tmp_graph = Graph()
+        tmp_graph.add((stimulus, RDF.type, SSN.Stimulus))
+        tmp_graph.set((stimulus, RDFS.comment, Literal(comment)))
+        tmp_graph.set((stimulus, self.SDTW.hasTime, Literal(t, datatype=XSD.dateTime)))
         for prop in props:
             prop = self.convertToURIRef(prop)
             datum = None
@@ -459,13 +458,13 @@ class DBInterface:
                 self.data_uri_base, "observations", featureName, propName, t
             )
             observation = self.convertToURIRef(observationURI)
-            self.data_graph.add((stimulus, SSN.isProxyFor, prop))
-            self.data_graph.add((observation, RDF.type, SOSA.Observation))
-            self.data_graph.set((observation, SOSA.madeBySensor, sensor))
-            self.data_graph.set((observation, SSN.wasOriginatedBy, stimulus))
-            self.data_graph.set((observation, SOSA.hasFeatureOfInterest, feature))
-            self.data_graph.set((observation, SOSA.observedProperty, prop))
-            self.data_graph.set(
+            tmp_graph.add((stimulus, SSN.isProxyFor, prop))
+            tmp_graph.add((observation, RDF.type, SOSA.Observation))
+            tmp_graph.set((observation, SOSA.madeBySensor, sensor))
+            tmp_graph.set((observation, SSN.wasOriginatedBy, stimulus))
+            tmp_graph.set((observation, SOSA.hasFeatureOfInterest, feature))
+            tmp_graph.set((observation, SOSA.observedProperty, prop))
+            tmp_graph.set(
                 (observation, SOSA.resultTime, Literal(t, datatype=XSD.dateTime))
             )
             proptype = self.getPropertyObservableType(prop)
@@ -479,16 +478,20 @@ class DBInterface:
                         raise DataValidationError(e)
                     unit = self.data_graph.value(prop, self.SDTW.hasUnit)
                     res = BNode()
-                    self.data_graph.set((observation, SOSA.hasResult, res))
-                    self.data_graph.set((res, RDF.type, SOSA.Result))
-                    self.data_graph.set((res, RDF.type, QUDT.Quantity))
-                    self.data_graph.set((res, QUDT.value, Literal(datum)))
-                    self.data_graph.set((res, QUDT.unit, unit))
+                    tmp_graph.set((observation, SOSA.hasResult, res))
+                    tmp_graph.set((res, RDF.type, SOSA.Result))
+                    tmp_graph.set((res, RDF.type, QUDT.Quantity))
+                    tmp_graph.set((res, QUDT.value, Literal(datum)))
+                    tmp_graph.set((res, QUDT.unit, unit))
                 case self.SDTW.categorical:
-                    self.data_graph.set((observation, SOSA.hasResult, Literal(datum)))
+                    tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
                 case other:
                     raise ValueError(f"property {prop} type not recognized: {other}")
-        self.data_graph.commit()
+        tmp_graph.commit()
+        ## Funny business with tmp_graph to only do one submission to DB rather than tons
+        ## Very significant performance improvement
+        tmp_graph_ttl = tmp_graph.serialize(format="ttl")
+        graph_store_post(self.store_path, tmp_graph_ttl, graph_uri=self.data_uri_base)
 
     def getCSV(self, feature):
         feature = self.convertToURIRef(feature)
@@ -525,7 +528,7 @@ class DBInterface:
                 ?observation sosa:hasResult ?category .
             }}"""  # nosec
 
-            LOGGER.info(category_query)
+            LOGGER.debug(category_query)
             qres = self.dataset.query(category_query)
             result = set()
             for row in qres:
