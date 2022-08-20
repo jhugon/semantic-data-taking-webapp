@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.3.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.3.0) - 2022-08-20
+
+- [`58975a1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/58975a1dc279d5cb08431c478c6747595fa6926e) feat: added version to navbar
+
 ## [v1.2.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.2.1) - 2022-08-20
 
 - [`acae939`](https://github.com/jhugon/semantic-data-taking-webapp/commit/acae939cbb9a62a44997070061294133a6c3c917) fix: fix DB getData bug introduced in c62e662dcf
