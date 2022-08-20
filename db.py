@@ -12,7 +12,7 @@ from io import StringIO
 import csv
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+# LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 
@@ -389,31 +389,59 @@ class DBInterface:
         ]
         data = []
         for stimulus in stimuli:
-            stim_data = []
-            observations = list(self.data_graph.subjects(SSN.wasOriginatedBy, stimulus))
-            for prop, proptype in zip(props, proptypes):
-                val = None
-                for observation in observations:
-                    if (observation, SOSA.observedProperty, prop) in self.data_graph:
-                        if val is None:
-                            match proptype:
-                                case self.SDTW.quantitative:
-                                    res = self.data_graph.value(
-                                        observation, SOSA.hasResult
-                                    )
-                                    val = self.data_graph.value(res, QUDT.value).value
-                                case self.SDTW.categorical:
-                                    val = self.data_graph.value(
-                                        observation, SOSA.hasResult
-                                    )
-                                case other:
-                                    raise ValueError(f"Unknown property type: {other}")
-                        else:
-                            print(
-                                f"Warning: {stimulus} {prop} has more than one observation!"
-                            )
-                stim_data.append(val)
-            data.append(stim_data)
+            quant_query = f"""
+            prefix sosa: <http://www.w3.org/ns/sosa/>
+            prefix ssn: <http://www.w3.org/ns/ssn/>
+            prefix qudt: <http://qudt.org/schema/qudt/>
+            select ?prop ?value
+            where {{
+                ?obs ssn:wasOriginatedBy {stimulus.n3()} .
+                ?obs sosa:observedProperty ?prop .
+                ?obs sosa:hasResult ?result .
+                ?result qudt:value ?value .
+            }}
+            """
+            quant_qres = list(self.data_graph.query(quant_query))
+            for row in quant_qres:
+                LOGGER.debug("        " + str(row))
+
+            other_query = f"""
+            prefix sosa: <http://www.w3.org/ns/sosa/>
+            prefix ssn: <http://www.w3.org/ns/ssn/>
+            prefix qudt: <http://qudt.org/schema/qudt/>
+            select ?prop ?result
+            where {{
+                ?obs ssn:wasOriginatedBy {stimulus.n3()} .
+                ?obs sosa:observedProperty ?prop .
+                ?obs sosa:hasResult ?result .
+                filter not exists {{ ?result qudt:value ?value . }}
+            }}
+            """
+            other_qres = list(self.data_graph.query(other_query))
+            for row in other_qres:
+                LOGGER.debug("        " + str(row))
+            propValueMap = dict()
+            for row in quant_qres + other_qres:
+                if row[0] in propValueMap:
+                    LOGGER.error(f"Propery has multiple values for stimulus")
+                    LOGGER.error(f"Propery {row[0]}")
+                    LOGGER.error(f"Stimulus {stimulus}")
+                    LOGGER.error(f"Values include:")
+                    LOGGER.error(propValueMap[row[0]])
+                    LOGGER.error(row[1])
+                    raise Exception(f"property has multiple values for stimulus")
+                else:
+                    propValueMap[row[0]] = row[1]
+            data_row = []
+            for prop in props:
+                try:
+                    value = propValueMap[prop]
+                    data_row.append(value)
+                    LOGGER.debug(f"  {prop}: {value}")
+                except KeyError:
+                    data_row.append(None)
+                    continue
+            data.append(data_row)
         return stim_times, data, stim_comments
 
     def enterData(self, feature, t, sensor, comment, datadict):
