@@ -18,10 +18,18 @@
         {% set prop=propheading[0] %}
         {% set heading=propheading[1] %}
         {% set categories=propheading[2] %}
-        {% if categories is none %}
+        {% set proptype=propheading[3] %}
+        {% if proptype == geopoint %}
+          <div>
+            <button type="button" class="btn btn-secondary" id="button_{{ prop }}" onclick="getGeoLocationPosition(event)">Capture Position for {{ heading }}</button>
+            <input type="text" id="latitude_{{prop}}" name="latitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="longitude_{{prop}}" name="longitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="altitude_{{prop}}" name="altitude_{{prop}}" value="" readonly hidden>
+          </div>
+        {% elif categories is none %}
           <div>
             <input type="text" id="{{ prop }}" name="{{ prop }}">
-            <label for="{{ prop }}">{{ heading }}<label>
+            <label for="{{ prop }}">{{ heading }} and type: {{ proptype }}<label>
           </div>
         {% else %}
           <div>
@@ -56,19 +64,33 @@
     {% endif %}
 {% endblock %}
 {% block pagescripts %}
-    <script>
+    <script type = "text/javascript">
         function handleGeoLocationData({coords, timestamp}) {
             console.log(coords)
+            // coords.latitude;
+            // coords.longitude;
+            // coords.accuracy;
+            // coords.altitude;
+            // coords.altitudeAccuracy;
         }
         function handleGeoLocationError({message}) {
             console.log("Error getting position: "+message);
         }
-        function getGeoLocationPosition() {
+        function getGeoLocationPosition(evt) {
+            evt.stopPropagation();
             if ('geolocation' in navigator) {
                 navigator.geolocation.getCurrentPosition(handleGeoLocationData, handleGeoLocationError);
             } else {
                 handleGeoLocationError({message: "geolocation not supported by this browser/device"});
             }
+            console.log(evt.target);
+            console.log(evt.target.id);
+            if (evt.target.id.startsWith("button_")) {
+                const propUri = evt.target.id.replace("button_","");
+            } else {
+                throw Exception("Button name doesn't match pattern");
+            }
+            return true;
         };
     </script>
 {% endblock %}

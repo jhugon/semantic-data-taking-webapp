@@ -522,7 +522,7 @@ class DBInterface:
                 case self.SDTW.categorical:
                     tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
                 case GEO.point:
-                    tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
+                    raise NotImplementedError(f"GEO.point not yet implemented")
                 case other:
                     raise ValueError(f"property {prop} type not recognized: {other}")
         tmp_graph.commit()

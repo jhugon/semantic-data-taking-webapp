@@ -261,9 +261,13 @@ def create_app():
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         props, headings = db.getColumnHeadings(feature)
         categories = []
+        proptypes = []
         for prop in props:
             categories.append(db.getCategories(prop))
-        propheadings = list(zip([str(prop) for prop in props], headings, categories))
+            proptypes.append(db.getPropertyObservableType(prop))
+        propheadings = list(
+            zip([str(prop) for prop in props], headings, categories, proptypes)
+        )
         return render_template(
             "enterdata.html",
             featureName=featureName,
@@ -272,6 +276,7 @@ def create_app():
             propheadings=propheadings,
             status=status,
             reason=reason,
+            geopoint=GEO.point,
         )
 
     @app.route("/form/addfeature", methods=["post"])
