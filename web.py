@@ -205,12 +205,14 @@ def create_app():
         comment = request.args["comment"]
         quantityKind = request.args["quantitykind"]
         quantityKindLabel = db.getLabel(quantityKind)
+        featureURLEncoded = urllib.parse.quote(feature, safe="")
         featureName = db.getLabel(feature)
         units = db.get_units_for_quantity_kind(quantityKind)
         return render_template(
             "selectpropertyunit.html",
             feature=feature,
             featureName=featureName,
+            featureURLEncoded=featureURLEncoded,
             propname=propname,
             proptype=proptype,
             comment=comment,
@@ -262,6 +264,7 @@ def create_app():
         return render_template(
             "enterdata.html",
             featureName=featureName,
+            featureURLEncoded=featureURLEncoded,
             feature=str(feature),
             propheadings=propheadings,
             status=status,
