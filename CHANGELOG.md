@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.4.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.4.0) - 2022-09-29
+
+- [`e48397e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e48397e43efb3707e3311d816f43e21c449e52a3) Merge pull request #45 from jhugon/back_to_feature_menu
+- [`a139787`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a139787e94916547e2d3072a6baf407b38bcbe95) feat: added "back to feature menu" nav button
+- [`6923cfa`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6923cfa2ceef16e9d98f93de1b3529e2c0e728e2) fix: added bandit to dev deps to make pre-commit work
+- [`8af8548`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8af8548ea964818a030e15fe2ed8569c8529efa8) fix: add cryptography lib to dev deps
+
 ## [v1.3.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.3.1) - 2022-08-20
 
 - [`c42c25e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c42c25e9694ecb1a8c85f1b6083e453394655494) fix(uplift): added .uplift.yml to manage bumping ver
