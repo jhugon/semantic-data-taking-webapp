@@ -25,6 +25,9 @@
             <input type="text" id="latitude_{{prop}}" name="latitude_{{prop}}" value="" readonly hidden>
             <input type="text" id="longitude_{{prop}}" name="longitude_{{prop}}" value="" readonly hidden>
             <input type="text" id="altitude_{{prop}}" name="altitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="altitudeAccuracy_{{prop}}" name="altitudeAccuracy_{{prop}}" value="" readonly hidden>
+            <input type="text" id="accuracy_{{prop}}" name="accuracy_{{prop}}" value="" readonly hidden>
+            <strong id="errorDisplay_{{prop}}"></strong>
           </div>
         {% elif categories is none %}
           <div>
@@ -65,30 +68,40 @@
 {% endblock %}
 {% block pagescripts %}
     <script type = "text/javascript">
-        function handleGeoLocationData({coords, timestamp}) {
-            console.log(coords)
-            // coords.latitude;
-            // coords.longitude;
-            // coords.accuracy;
-            // coords.altitude;
-            // coords.altitudeAccuracy;
+        function handleGeoLocationData({coords}, propUri) {
+            const geo_attrs = ["latitude","longitude","altitude","accuracy","altitudeAccuracy"];
+            geo_attrs.forEach( (x)=> {
+                document.getElementById(x + "_" + propUri).value = coords[x];
+            });
+            const errorDisplay = document.getElementById("errorDisplay_"+propUri);
+            errorDisplay.innerHTML = "Success! Accuracy: "+String(coords.accuracy)+" m";
+            errorDisplay.classList.add("text-success");
         }
-        function handleGeoLocationError({message}) {
-            console.log("Error getting position: "+message);
+        function handleGeoLocationError({message}, propUri) {
+            console.log("Error getting position: "+message + " proprUri: "+propUri);
+            const errorDisplay = document.getElementById("errorDisplay_"+propUri);
+            errorDisplay.innerHTML = "Error: " + message;
+            errorDisplay.classList.add("text-danger");
         }
         function getGeoLocationPosition(evt) {
             evt.stopPropagation();
-            if ('geolocation' in navigator) {
-                navigator.geolocation.getCurrentPosition(handleGeoLocationData, handleGeoLocationError);
-            } else {
-                handleGeoLocationError({message: "geolocation not supported by this browser/device"});
-            }
-            console.log(evt.target);
-            console.log(evt.target.id);
+            let propUri = "";
             if (evt.target.id.startsWith("button_")) {
-                const propUri = evt.target.id.replace("button_","");
+                propUri = evt.target.id.replace("button_","");
             } else {
                 throw Exception("Button name doesn't match pattern");
+            }
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        handleGeoLocationData(pos,propUri);
+                    },
+                    (err) => {
+                        handleGeoLocationError(err,propUri);
+                    }
+                );
+            } else {
+                handleGeoLocationError({propUri: propUri, message: "geolocation not supported by this browser/device"});
             }
             return true;
         };
