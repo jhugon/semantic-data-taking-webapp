@@ -5,7 +5,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
 from flask_talisman import Talisman
 
-from db import DBInterface, DataValidationError, GetSubjectError, QUDT
+from db import DBInterface, DataValidationError, GetSubjectError, QUDT, GEO
 from flask_simple_login import (
     auth,
     User,
@@ -152,6 +152,9 @@ def create_app():
                     propInfo["unit"] = db.getLabel(unit)
                 case db.SDTW.categorical:
                     propInfo["qk"] = "Categorical"
+                    propInfo["unit"] = ""
+                case GEO.point:
+                    propInfo["qk"] = "Geographic point"
                     propInfo["unit"] = ""
                 case _:
                     raise ValueError(

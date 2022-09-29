@@ -30,6 +30,10 @@
           <input type="radio" name="proptype" id="categorical" value="categorical">
           <label for="categorical">Catagorical</label>
         </div>
+        <div>
+          <input type="radio" name="proptype" id="geographicpoint" value="geographicpoint">
+          <label for="geographicpoint">Geographic Point</label>
+        </div>
       </div>
       <div>
         <label for="quantitykind">Kind of Quantity (<em>only used for quantitative</em>):</label>
@@ -68,7 +72,7 @@
                 form.action = "/selectpropertyunit"
                 form.method = "GET";
                 form.onsubmit = null;
-            } else if (proptype == "categorical") {
+            } else {
                 form.action = "/form/addproperty"
                 form.method = "POST";
                 form.onsubmit = null;

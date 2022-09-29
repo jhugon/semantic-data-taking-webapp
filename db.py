@@ -1,5 +1,5 @@
 from rdflib import Dataset, Graph, Namespace, URIRef, BNode, Literal
-from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA
+from rdflib.namespace import RDF, RDFS, XSD, SSN, SOSA, GEO
 from rdflib.store import NO_STORE, VALID_STORE
 from rdflib.plugins.stores.sparqlstore import SPARQLUpdateStore, _node_to_sparql
 import os.path
@@ -286,6 +286,13 @@ class DBInterface:
                     (prop, self.SDTW.hasObservableType, self.SDTW.categorical)
                 )
                 self.data_graph.commit()
+            case "geographicpoint":
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set((prop, self.SDTW.hasObservableType, GEO.point))
+                self.data_graph.commit()
             case other:
                 raise ValueError(f"Unknown property type: {other}")
 
@@ -309,6 +316,9 @@ class DBInterface:
                 return result
             case self.SDTW.categorical:
                 result = f"{label}"
+                return result
+            case GEO.point:
+                result = f"{label} [Geo Point]"
                 return result
             case other:
                 raise ValueError(f"Unknown property type: {other}")
@@ -356,6 +366,10 @@ class DBInterface:
             case [(s, p, self.SDTW.categorical)]:
                 raise ValueError(
                     f"Property {observedProperty} is categorical, there are no QK or units"
+                )
+            case [(s, p, GEO.point)]:
+                raise ValueError(
+                    f"Property {observedProperty} is geographic point, there are no QK or units"
                 )
             case _:
                 raise ValueError(
@@ -506,6 +520,8 @@ class DBInterface:
                     tmp_graph.set((res, QUDT.value, Literal(datum)))
                     tmp_graph.set((res, QUDT.unit, unit))
                 case self.SDTW.categorical:
+                    tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
+                case GEO.point:
                     tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
                 case other:
                     raise ValueError(f"property {prop} type not recognized: {other}")
