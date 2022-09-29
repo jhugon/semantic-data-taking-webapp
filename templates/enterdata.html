@@ -55,3 +55,20 @@
     </div>
     {% endif %}
 {% endblock %}
+{% block pagescripts %}
+    <script>
+        function handleGeoLocationData({coords, timestamp}) {
+            console.log(coords)
+        }
+        function handleGeoLocationError({message}) {
+            console.log("Error getting position: "+message);
+        }
+        function getGeoLocationPosition() {
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(handleGeoLocationData, handleGeoLocationError);
+            } else {
+                handleGeoLocationError({message: "geolocation not supported by this browser/device"});
+            }
+        };
+    </script>
+{% endblock %}
