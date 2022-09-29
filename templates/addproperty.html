@@ -3,6 +3,11 @@
 {% block head %}
     {{ super() }}
 {% endblock %}
+{% block navlist %}
+  <li class="nav-item">
+    <a href="/feature?feature={{ featureURLEncoded }}" class="nav-link">Back to Feature Menu</a>
+  </li>
+{% endblock %}
 {% block content %}
   <h2>
     Add Property to {{ featureName }} Feature
