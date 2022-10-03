@@ -430,6 +430,7 @@ class DBInterface:
                 ?obs sosa:observedProperty ?prop .
                 ?obs sosa:hasResult ?result .
                 filter not exists {{ ?result qudt:value ?value . }}
+                filter ( datatype(?result) != '' )
             }}
             """
             other_qres = list(self.data_graph.query(other_query))
@@ -447,6 +448,58 @@ class DBInterface:
                     raise Exception(f"property has multiple values for stimulus")
                 else:
                     propValueMap[row[0]] = row[1]
+
+            #### Multi-valued props
+
+            geo_query = f"""
+            prefix sosa: <http://www.w3.org/ns/sosa/>
+            prefix ssn: <http://www.w3.org/ns/ssn/>
+            prefix qudt: <http://qudt.org/schema/qudt/>
+            prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+            select ?prop ?latitude ?longitude ?altitude ?accuracy ?altitudeAccuracy
+            where {{
+                ?obs ssn:wasOriginatedBy {stimulus.n3()} .
+                ?obs sosa:observedProperty ?prop .
+                ?obs sosa:hasResult ?result .
+                Optional {{ ?result wgs84_pos:latitude ?latitude }} .
+                Optional {{ ?result wgs84_pos:longitude ?longitude }} .
+                Optional {{ ?result wgs84_pos:altitude ?altitude }} .
+                Optional {{ ?result wgs84_pos:altitudeAccuracy ?altitudeAccuracy }} .
+                Optional {{ ?result wgs84_pos:accuracy ?accuracy }} .
+            }}
+            """
+            geo_qres_raw = list(self.data_graph.query(geo_query))
+            for row in geo_qres_raw:
+                LOGGER.debug("        " + str(row))
+            propValueMapGeo = {}
+            for row in geo_qres_raw:
+                if row[1:].count(None) == len(row) - 1:
+                    continue
+                if row[0] in propValueMapGeo:
+                    LOGGER.error(f"Propery has multiple values for stimulus")
+                    LOGGER.error(f"Propery {row[0]}")
+                    LOGGER.error(f"Stimulus {stimulus}")
+                    LOGGER.error(f"Values include:")
+                    LOGGER.error(propValueMap[row[0]])
+                    LOGGER.error(row)
+                    raise Exception(f"property has multiple values for stimulus")
+                else:
+                    LOGGER.debug(f"resultRow: {row}")
+                    LOGGER.debug(f"resultRow: {row['latitude']}")
+                    row2 = {
+                        "latitude": row["latitude"],
+                        "longitude": row["longitude"],
+                        "altitude": row["altitude"],
+                        "accuracy": row["accuracy"],
+                        "altitudeAccuracy": row["altitudeAccuracy"],
+                    }
+                    for key in row2:
+                        if isinstance(row2[key], Literal):
+                            row2[key] = row2[key].value
+                    propValueMapGeo[row["prop"]] = row2
+            LOGGER.debug(f"propValueMapGeo: {propValueMapGeo}")
+            propValueMap.update(propValueMapGeo)
+
             data_row = []
             for prop in props:
                 try:
