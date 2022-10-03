@@ -12,7 +12,7 @@ from io import StringIO
 import csv
 
 LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
+# LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
 GEO = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
