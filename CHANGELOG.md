@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.0) - 2022-10-03
+
+- [`cbd348c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/cbd348cb199a9ea7765ef2a5c054ce2f4ba7582f) Merge pull request #47 from jhugon/geolocation
+- [`71cbc84`](https://github.com/jhugon/semantic-data-taking-webapp/commit/71cbc845f5fb76bfb78ba1160a9c83d3573b3281) fix(db): commented out debug log level
+- [`b3b8818`](https://github.com/jhugon/semantic-data-taking-webapp/commit/b3b8818aaf0a71f05bbeb4e34c453b48b5f22afd) feat(db): get data for geo points
+- [`54fbc4c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/54fbc4caf8dc1613ae77258a46986bbfca00ecf7) feat(db): can now submit geo points to db
+- [`8b891ad`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8b891ad55320c0e3afe8b2ed71ec3bdaf8f25d21) feat(enterdata): got geolocation forms working correctly
+- [`6fa40e4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6fa40e4f4c5c55b1c4c06c78c9641f60b5a02098) feat: working on putting geoloc in form
+- [`ff2464c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ff2464c58f92003b12dab6cb61bb8e316486a7a1) feat: can now add a prop that is a geographic point
+- [`12f0bc5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/12f0bc541d876c90e1326e83559dc1cc1999b9fa) feat: added strawman geolocation test to enterdata page
+
 ## [v1.4.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.4.1) - 2022-10-03
 
 - [`32dbb49`](https://github.com/jhugon/semantic-data-taking-webapp/commit/32dbb49d967d14c709c3607986ac477dfbdba01b) fix: made navbar responsive with drop down button
