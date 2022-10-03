@@ -18,10 +18,21 @@
         {% set prop=propheading[0] %}
         {% set heading=propheading[1] %}
         {% set categories=propheading[2] %}
-        {% if categories is none %}
+        {% set proptype=propheading[3] %}
+        {% if proptype == geopoint %}
+          <div>
+            <button type="button" class="btn btn-secondary" id="button_{{ prop }}" onclick="getGeoLocationPosition(event)">Capture Position for {{ heading }}</button>
+            <input type="text" id="latitude_{{prop}}" name="latitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="longitude_{{prop}}" name="longitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="altitude_{{prop}}" name="altitude_{{prop}}" value="" readonly hidden>
+            <input type="text" id="altitudeAccuracy_{{prop}}" name="altitudeAccuracy_{{prop}}" value="" readonly hidden>
+            <input type="text" id="accuracy_{{prop}}" name="accuracy_{{prop}}" value="" readonly hidden>
+            <strong id="errorDisplay_{{prop}}"></strong>
+          </div>
+        {% elif categories is none %}
           <div>
             <input type="text" id="{{ prop }}" name="{{ prop }}">
-            <label for="{{ prop }}">{{ heading }}<label>
+            <label for="{{ prop }}">{{ heading }} and type: {{ proptype }}<label>
           </div>
         {% else %}
           <div>
@@ -54,4 +65,45 @@
       Error: {{ reason }}
     </div>
     {% endif %}
+{% endblock %}
+{% block pagescripts %}
+    <script type = "text/javascript">
+        function handleGeoLocationData({coords}, propUri) {
+            const geo_attrs = ["latitude","longitude","altitude","accuracy","altitudeAccuracy"];
+            geo_attrs.forEach( (x)=> {
+                document.getElementById(x + "_" + propUri).value = coords[x];
+            });
+            const errorDisplay = document.getElementById("errorDisplay_"+propUri);
+            errorDisplay.innerHTML = "Success! Accuracy: "+String(coords.accuracy)+" m";
+            errorDisplay.classList.add("text-success");
+        }
+        function handleGeoLocationError({message}, propUri) {
+            console.log("Error getting position: "+message + " proprUri: "+propUri);
+            const errorDisplay = document.getElementById("errorDisplay_"+propUri);
+            errorDisplay.innerHTML = "Error: " + message;
+            errorDisplay.classList.add("text-danger");
+        }
+        function getGeoLocationPosition(evt) {
+            evt.stopPropagation();
+            let propUri = "";
+            if (evt.target.id.startsWith("button_")) {
+                propUri = evt.target.id.replace("button_","");
+            } else {
+                throw Exception("Button name doesn't match pattern");
+            }
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        handleGeoLocationData(pos,propUri);
+                    },
+                    (err) => {
+                        handleGeoLocationError(err,propUri);
+                    }
+                );
+            } else {
+                handleGeoLocationError({propUri: propUri, message: "geolocation not supported by this browser/device"});
+            }
+            return true;
+        };
+    </script>
 {% endblock %}

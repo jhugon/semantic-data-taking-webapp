@@ -5,7 +5,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager, current_user
 from flask_talisman import Talisman
 
-from db import DBInterface, DataValidationError, GetSubjectError, QUDT
+from db import DBInterface, DataValidationError, GetSubjectError, QUDT, GEO
 from flask_simple_login import (
     auth,
     User,
@@ -153,6 +153,9 @@ def create_app():
                 case db.SDTW.categorical:
                     propInfo["qk"] = "Categorical"
                     propInfo["unit"] = ""
+                case GEO.point:
+                    propInfo["qk"] = "Geographic point"
+                    propInfo["unit"] = ""
                 case _:
                     raise ValueError(
                         "Unkown property type: {proptype} for property: {prop}"
@@ -258,9 +261,13 @@ def create_app():
         featureURLEncoded = urllib.parse.quote(feature, safe="")
         props, headings = db.getColumnHeadings(feature)
         categories = []
+        proptypes = []
         for prop in props:
             categories.append(db.getCategories(prop))
-        propheadings = list(zip([str(prop) for prop in props], headings, categories))
+            proptypes.append(db.getPropertyObservableType(prop))
+        propheadings = list(
+            zip([str(prop) for prop in props], headings, categories, proptypes)
+        )
         return render_template(
             "enterdata.html",
             featureName=featureName,
@@ -269,6 +276,7 @@ def create_app():
             propheadings=propheadings,
             status=status,
             reason=reason,
+            geopoint=GEO.point,
         )
 
     @app.route("/form/addfeature", methods=["post"])

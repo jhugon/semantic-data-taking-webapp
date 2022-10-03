@@ -15,6 +15,7 @@ LOGGER = logging.getLogger(__name__)
 # LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
+GEO = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
 
 
 def my_bnode_ext(node):
@@ -286,6 +287,13 @@ class DBInterface:
                     (prop, self.SDTW.hasObservableType, self.SDTW.categorical)
                 )
                 self.data_graph.commit()
+            case "geographicpoint":
+                self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
+                self.data_graph.set((prop, RDFS.label, label))
+                self.data_graph.set((prop, RDFS.comment, comment))
+                self.data_graph.set((prop, SSN.isPropertyOf, feature))
+                self.data_graph.set((prop, self.SDTW.hasObservableType, GEO.point))
+                self.data_graph.commit()
             case other:
                 raise ValueError(f"Unknown property type: {other}")
 
@@ -309,6 +317,9 @@ class DBInterface:
                 return result
             case self.SDTW.categorical:
                 result = f"{label}"
+                return result
+            case GEO.point:
+                result = f"{label} [Geo Point]"
                 return result
             case other:
                 raise ValueError(f"Unknown property type: {other}")
@@ -356,6 +367,10 @@ class DBInterface:
             case [(s, p, self.SDTW.categorical)]:
                 raise ValueError(
                     f"Property {observedProperty} is categorical, there are no QK or units"
+                )
+            case [(s, p, GEO.point)]:
+                raise ValueError(
+                    f"Property {observedProperty} is geographic point, there are no QK or units"
                 )
             case _:
                 raise ValueError(
@@ -415,6 +430,7 @@ class DBInterface:
                 ?obs sosa:observedProperty ?prop .
                 ?obs sosa:hasResult ?result .
                 filter not exists {{ ?result qudt:value ?value . }}
+                filter ( datatype(?result) != '' )
             }}
             """
             other_qres = list(self.data_graph.query(other_query))
@@ -432,6 +448,58 @@ class DBInterface:
                     raise Exception(f"property has multiple values for stimulus")
                 else:
                     propValueMap[row[0]] = row[1]
+
+            #### Multi-valued props
+
+            geo_query = f"""
+            prefix sosa: <http://www.w3.org/ns/sosa/>
+            prefix ssn: <http://www.w3.org/ns/ssn/>
+            prefix qudt: <http://qudt.org/schema/qudt/>
+            prefix wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+            select ?prop ?latitude ?longitude ?altitude ?accuracy ?altitudeAccuracy
+            where {{
+                ?obs ssn:wasOriginatedBy {stimulus.n3()} .
+                ?obs sosa:observedProperty ?prop .
+                ?obs sosa:hasResult ?result .
+                Optional {{ ?result wgs84_pos:latitude ?latitude }} .
+                Optional {{ ?result wgs84_pos:longitude ?longitude }} .
+                Optional {{ ?result wgs84_pos:altitude ?altitude }} .
+                Optional {{ ?result wgs84_pos:altitudeAccuracy ?altitudeAccuracy }} .
+                Optional {{ ?result wgs84_pos:accuracy ?accuracy }} .
+            }}
+            """
+            geo_qres_raw = list(self.data_graph.query(geo_query))
+            for row in geo_qres_raw:
+                LOGGER.debug("        " + str(row))
+            propValueMapGeo = {}
+            for row in geo_qres_raw:
+                if row[1:].count(None) == len(row) - 1:
+                    continue
+                if row[0] in propValueMapGeo:
+                    LOGGER.error(f"Propery has multiple values for stimulus")
+                    LOGGER.error(f"Propery {row[0]}")
+                    LOGGER.error(f"Stimulus {stimulus}")
+                    LOGGER.error(f"Values include:")
+                    LOGGER.error(propValueMap[row[0]])
+                    LOGGER.error(row)
+                    raise Exception(f"property has multiple values for stimulus")
+                else:
+                    LOGGER.debug(f"resultRow: {row}")
+                    LOGGER.debug(f"resultRow: {row['latitude']}")
+                    row2 = {
+                        "latitude": row["latitude"],
+                        "longitude": row["longitude"],
+                        "altitude": row["altitude"],
+                        "accuracy": row["accuracy"],
+                        "altitudeAccuracy": row["altitudeAccuracy"],
+                    }
+                    for key in row2:
+                        if isinstance(row2[key], Literal):
+                            row2[key] = row2[key].value
+                    propValueMapGeo[row["prop"]] = row2
+            LOGGER.debug(f"propValueMapGeo: {propValueMapGeo}")
+            propValueMap.update(propValueMapGeo)
+
             data_row = []
             for prop in props:
                 try:
@@ -466,38 +534,29 @@ class DBInterface:
         tmp_graph.add((stimulus, RDF.type, SSN.Stimulus))
         tmp_graph.set((stimulus, RDFS.comment, Literal(comment)))
         tmp_graph.set((stimulus, self.SDTW.hasTime, Literal(t, datatype=XSD.dateTime)))
+
+        LOGGER.debug(f"datadict: {datadict}")
         for prop in props:
             prop = self.convertToURIRef(prop)
             datum = None
-            try:
-                datum = datadict[str(prop)]
-            except KeyError:
-                continue
-            if re.match(r"^\s*$", datum):
-                continue
-            propName = self.getLabel(prop)
-            observationURI = os.path.join(
-                self.data_uri_base, "observations", featureName, propName, t
-            )
-            observation = self.convertToURIRef(observationURI)
-            tmp_graph.add((stimulus, SSN.isProxyFor, prop))
-            tmp_graph.add((observation, RDF.type, SOSA.Observation))
-            tmp_graph.set((observation, SOSA.madeBySensor, sensor))
-            tmp_graph.set((observation, SSN.wasOriginatedBy, stimulus))
-            tmp_graph.set((observation, SOSA.hasFeatureOfInterest, feature))
-            tmp_graph.set((observation, SOSA.observedProperty, prop))
-            tmp_graph.set(
-                (observation, SOSA.resultTime, Literal(t, datatype=XSD.dateTime))
-            )
             proptype = self.getPropertyObservableType(prop)
             match proptype:
                 case self.SDTW.quantitative:
+                    try:
+                        datum = datadict[str(prop)]
+                    except KeyError:
+                        continue
+                    if re.match(r"^\s*$", datum):
+                        continue
                     try:
                         datum = float(datum)
                     except ValueError as e:
                         raise DataValidationError(e)
                     except TypeError as e:
                         raise DataValidationError(e)
+                    observation = self._addObservationTriples(
+                        tmp_graph, prop, stimulus, sensor, feature, featureName, t
+                    )
                     unit = self.data_graph.value(prop, self.SDTW.hasUnit)
                     res = BNode()
                     tmp_graph.set((observation, SOSA.hasResult, res))
@@ -506,7 +565,52 @@ class DBInterface:
                     tmp_graph.set((res, QUDT.value, Literal(datum)))
                     tmp_graph.set((res, QUDT.unit, unit))
                 case self.SDTW.categorical:
+                    try:
+                        datum = datadict[str(prop)]
+                    except KeyError:
+                        continue
+                    if re.match(r"^\s*$", datum):
+                        continue
+                    observation = self._addObservationTriples(
+                        tmp_graph, prop, stimulus, sensor, feature, featureName, t
+                    )
                     tmp_graph.set((observation, SOSA.hasResult, Literal(datum)))
+                case GEO.point:
+                    res = BNode()
+                    observation = None
+                    subprops = [
+                        "latitude",
+                        "longitude",
+                        "altitude",
+                        "altitudeAccuracy",
+                        "accuracy",
+                    ]
+                    for subprop in subprops:
+                        try:
+                            datum = datadict[subprop + "_" + str(prop)]
+                        except KeyError:
+                            continue
+                        if re.match(r"^\s*$", datum):
+                            continue
+                        try:
+                            datum = float(datum)
+                        except ValueError as e:
+                            raise DataValidationError(e)
+                        except TypeError as e:
+                            raise DataValidationError(e)
+                        if observation is None:
+                            observation = self._addObservationTriples(
+                                tmp_graph,
+                                prop,
+                                stimulus,
+                                sensor,
+                                feature,
+                                featureName,
+                                t,
+                            )
+                            tmp_graph.set((observation, SOSA.hasResult, res))
+                        subpropURI = getattr(GEO, subprop)
+                        tmp_graph.set((res, subpropURI, Literal(datum)))
                 case other:
                     raise ValueError(f"property {prop} type not recognized: {other}")
         tmp_graph.commit()
@@ -677,6 +781,23 @@ class DBInterface:
                     store_path, response.text, graph_uri=url, content_type=content_type
                 )
                 LOGGER.info(f"Done with {url}")
+
+    def _addObservationTriples(
+        self, tmp_graph, prop, stimulus, sensor, feature, featureName, t
+    ):
+        propName = self.getLabel(prop)
+        observationURI = os.path.join(
+            self.data_uri_base, "observations", featureName, propName, t
+        )
+        observation = self.convertToURIRef(observationURI)
+        tmp_graph.add((stimulus, SSN.isProxyFor, prop))
+        tmp_graph.add((observation, RDF.type, SOSA.Observation))
+        tmp_graph.set((observation, SOSA.madeBySensor, sensor))
+        tmp_graph.set((observation, SSN.wasOriginatedBy, stimulus))
+        tmp_graph.set((observation, SOSA.hasFeatureOfInterest, feature))
+        tmp_graph.set((observation, SOSA.observedProperty, prop))
+        tmp_graph.set((observation, SOSA.resultTime, Literal(t, datatype=XSD.dateTime)))
+        return observation
 
 
 def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
