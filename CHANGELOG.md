@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.4.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.4.1) - 2022-10-03
+
+- [`32dbb49`](https://github.com/jhugon/semantic-data-taking-webapp/commit/32dbb49d967d14c709c3607986ac477dfbdba01b) fix: made navbar responsive with drop down button
+
 ## [v1.4.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.4.0) - 2022-09-29
 
 - [`e48397e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/e48397e43efb3707e3311d816f43e21c449e52a3) Merge pull request #45 from jhugon/back_to_feature_menu
