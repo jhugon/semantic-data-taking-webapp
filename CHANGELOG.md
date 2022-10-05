@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.2](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.2) - 2022-10-05
+
+- [`441aedf`](https://github.com/jhugon/semantic-data-taking-webapp/commit/441aedf2242b531407cf03af7f8e8315d5cbe674) fix: data table view now shows "" instead of "None"
+
 ## [v1.5.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.1) - 2022-10-05
 
 - [`026f7b4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/026f7b4b06ccbfbb40fb72bcb98c2b352597c885) fix: remove debug info in enterdata page
