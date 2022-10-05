@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.1) - 2022-10-05
+
+- [`026f7b4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/026f7b4b06ccbfbb40fb72bcb98c2b352597c885) fix: remove debug info in enterdata page
+
 ## [v1.5.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.0) - 2022-10-03
 
 - [`cbd348c`](https://github.com/jhugon/semantic-data-taking-webapp/commit/cbd348cb199a9ea7765ef2a5c054ce2f4ba7582f) Merge pull request #47 from jhugon/geolocation
