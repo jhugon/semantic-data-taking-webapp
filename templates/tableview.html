@@ -34,7 +34,9 @@
           </td>
           {% for data_cell in data_row %}
             <td>
-              {{ data_cell }}
+              {% if data_cell is not none %}
+                {{ data_cell }}
+              {% endif %}
             </td>
           {% endfor %}
           <td>
