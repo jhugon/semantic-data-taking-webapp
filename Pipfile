@@ -4,19 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-rdflib = "*"
-flask = "*"
+rdflib = "~=6.3.1"
+flask = "~=2.2.0"
 flask-simple-login = {editable = true, path = "./flask-simple-login"}
-httpx = "*"
-flask-talisman = "*"
-cryptography = "*"
-berkeleydb = "*"
-gunicorn = "*"
+httpx = "~=0.23.3"
+flask-talisman = "~=1.0.0"
+cryptography = "~=39.0.2"
+berkeleydb = "~=18.1.5"
+gunicorn = "~=20.1.0"
 
 [dev-packages]
-black = "*"
-cryptography = "*"
-bandit = "*"
+black = "~=23.1.0"
+bandit = "~=1.7.5"
 
 [requires]
 python_version = "3.10"

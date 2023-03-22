@@ -23,6 +23,12 @@ The app should be visible at https://semweb.localhost:8080
 
 ## Run Test Server
 
+First, make sure BerkeleyDB is installed on your system:
+
+```bash
+sudo apt install libdb-dev
+```
+
 Set things up:
 
 ```bash
