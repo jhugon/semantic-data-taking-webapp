@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.3](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.3) - 2023-03-22
+
+- [`639dd7d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/639dd7dd130ecc1b3258bed1f7f7914782a3f2b9) fix: bump Jena-Fuseki Dockerfile versions
+- [`35a41b6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/35a41b643a6d01801d35057e8e57beee251c5fc2) docs: remove ` type from README.md
+- [`bf4ac7b`](https://github.com/jhugon/semantic-data-taking-webapp/commit/bf4ac7b6f2d62cf7b4646d1851de25a2a7170d2b) chore: update pre-commit config versions
+
 ## [v1.5.2](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.2) - 2022-10-05
 
 - [`441aedf`](https://github.com/jhugon/semantic-data-taking-webapp/commit/441aedf2242b531407cf03af7f8e8315d5cbe674) fix: data table view now shows "" instead of "None"
