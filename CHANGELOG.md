@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.4](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.4) - 2023-03-29
+
+- [`7937f82`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7937f828013e535594c0f7df940a15ee94b2723a) fix: trying to fix docker CI, trigger on tags now
+- [`3b37552`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3b37552f7d79a843505fb72b1463f5f1ca4b2723) ci: Still trying to get docker workflow to work
+- [`0b3f83a`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0b3f83a41424ae5962d5fb8313141516be36a375) ci: try to fix by adding checkout action to docker workflow
+- [`6ec6ed7`](https://github.com/jhugon/semantic-data-taking-webapp/commit/6ec6ed7dbab4389d77a7e2bc0de970022c99e4d0) ci: adding docker image build workflow
+- [`423d726`](https://github.com/jhugon/semantic-data-taking-webapp/commit/423d726a0d4ed54ece8443d12aed05da99973e6b) build: updated Pipfile and lock
+
 ## [v1.5.3](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.3) - 2023-03-22
 
 - [`639dd7d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/639dd7dd130ecc1b3258bed1f7f7914782a3f2b9) fix: bump Jena-Fuseki Dockerfile versions

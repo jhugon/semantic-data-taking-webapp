@@ -20,7 +20,7 @@
             {% block navlist %}
             {% endblock %}
           </ul>
-          <span class=swversion>1.5.3</span>
+          <span class=swversion>1.5.4</span>
           {% if (current_user.is_authenticated and current_user.is_active) %}
             <button class="btn btn-success disabled" role="button">Login</button>
             <a class="btn btn-danger" href="{{url_for('auth.logout')}}" role="button">Logout</a>
