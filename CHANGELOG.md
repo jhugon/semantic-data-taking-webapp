@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.5](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.5) - 2023-03-29
+
+- [`0682a74`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0682a743efe65e3bdaf7cda993e0661b8f0e9ae4) fix: uplift workflow now uses personal access token
+
 ## [v1.5.4](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.4) - 2023-03-29
 
 - [`7937f82`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7937f828013e535594c0f7df940a15ee94b2723a) fix: trying to fix docker CI, trigger on tags now
