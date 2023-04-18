@@ -23,8 +23,7 @@ RUN ls -l $HOME
 RUN ls -l .
 RUN ls -l flask-simple-login
 
-RUN python -m pip install --upgrade pip
-RUN pip install pipenv
+RUN pip install "pipenv==2023.3.20"
 RUN pipenv sync
 
 # Do this after pip so earlier steps can be cached by Docker
