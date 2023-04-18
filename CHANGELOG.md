@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.6](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.6) - 2023-04-18
+
+- [`9809d67`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9809d67b463b30c2acd7d3f7b4c745667848c7ed) fix(build): fixing the pipenv version to add repetability
+- [`f2417b5`](https://github.com/jhugon/semantic-data-taking-webapp/commit/f2417b5d48a3c20e34389726d38c8b9fae608c52) ci(docker): stop making releases
+- [`7a00e2e`](https://github.com/jhugon/semantic-data-taking-webapp/commit/7a00e2eb8c9afc195d96bcc0370873c68396db93) ci(docker): checkout submodules
+- [`ab9c751`](https://github.com/jhugon/semantic-data-taking-webapp/commit/ab9c751ed2264414842710c3e370b508722a0dc9) ci: try to make docker workflow manually triggerable
+
 ## [v1.5.5](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.5) - 2023-03-29
 
 - [`0682a74`](https://github.com/jhugon/semantic-data-taking-webapp/commit/0682a743efe65e3bdaf7cda993e0661b8f0e9ae4) fix: uplift workflow now uses personal access token
