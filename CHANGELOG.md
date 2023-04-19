@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.5.7](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.7) - 2023-04-19
+
+- [`84e19bd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/84e19bdc2b0e8a1ac3fff8b5f4b7a25635c9ad6c) fix: trying to get uplift to trigger action
+
 ## [v1.5.6](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.6) - 2023-04-18
 
 - [`9809d67`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9809d67b463b30c2acd7d3f7b4c745667848c7ed) fix(build): fixing the pipenv version to add repetability
