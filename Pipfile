@@ -5,7 +5,7 @@ name = "pypi"
 
 [packages]
 rdflib = "~=6.3.1"
-flask = "~=2.2.0"
+flask = "~=2.3.0"
 flask-simple-login = {editable = true, path = "./flask-simple-login"}
 httpx = "~=0.23.3"
 flask-talisman = "~=1.0.0"
