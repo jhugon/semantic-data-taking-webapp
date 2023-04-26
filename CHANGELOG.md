@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.6.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.6.1) - 2023-04-26
+
+- [`3891602`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3891602b774093fb87aad22bda9ca91d54f1ce70) fix: trying to get uplift to trigger github action
+
 ## [v1.6.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.6.0) - 2023-04-26
 
 - [`adf3508`](https://github.com/jhugon/semantic-data-taking-webapp/commit/adf3508e6245921a0d0966a40e20d6fd2093575d) ci: re-enable docker workflow on tag push
