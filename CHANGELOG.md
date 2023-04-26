@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.7.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.7.0) - 2023-04-26
+
+- [`a2171a8`](https://github.com/jhugon/semantic-data-taking-webapp/commit/a2171a8f3db4822781375cd269f0e43539a5c2ff) feat(docker): now have to run manually
+
 ## [v1.6.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.6.1) - 2023-04-26
 
 - [`3891602`](https://github.com/jhugon/semantic-data-taking-webapp/commit/3891602b774093fb87aad22bda9ca91d54f1ce70) fix: trying to get uplift to trigger github action
