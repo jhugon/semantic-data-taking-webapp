@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.6.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.6.0) - 2023-04-26
+
+- [`adf3508`](https://github.com/jhugon/semantic-data-taking-webapp/commit/adf3508e6245921a0d0966a40e20d6fd2093575d) ci: re-enable docker workflow on tag push
+- [`c3d589d`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c3d589d6ac0af7987b4eb4d7727cf8b4c49d0c0a) feat: update Flask version to ~2.3.0
+
 ## [v1.5.7](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.5.7) - 2023-04-19
 
 - [`84e19bd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/84e19bdc2b0e8a1ac3fff8b5f4b7a25635c9ad6c) fix: trying to get uplift to trigger action
