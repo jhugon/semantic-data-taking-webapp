@@ -21,8 +21,11 @@ services:
     depends_on:
       - semantic-app
   db-server:
-    build: ./jena-fuseki
+    image: ghcr.io/jhugon/apache-jena-fuseki-docker:main
     ports:
       - "3030:3030"
     volumes:
-      - ./jenadb/:/app/db
+      - jenadb:/fuseki/databases
+    command: ["--update","--loc=/fuseki/databases","/semweb"]
+volumes:
+  jenadb:
