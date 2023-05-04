@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.8.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.8.1) - 2023-05-04
+
+- [`c17ae7f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c17ae7fe9e882af4ff400250f7f75c70f9e52434) fix(deps): Security upgrade to Flask
+
 ## [v1.8.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.8.0) - 2023-04-27
 
 - [`fea6a10`](https://github.com/jhugon/semantic-data-taking-webapp/commit/fea6a104c25feab07e13c04f6618d1f609f8fbc2) feat: added docker-compose-prod.yml
