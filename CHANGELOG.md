@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.9.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.9.0) - 2023-05-04
+
+- [`1cf0bb1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1cf0bb148986da83e0ca009677d8fd30a2cece3a) Jena fuseki docker image (#53)
+
 ## [v1.8.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.8.1) - 2023-05-04
 
 - [`c17ae7f`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c17ae7fe9e882af4ff400250f7f75c70f9e52434) fix(deps): Security upgrade to Flask
