@@ -10,6 +10,9 @@ services:
       FLASK_DB_STORE_PATH: http://db-server:3030/semweb
     depends_on:
       - db-server
+    ## Uncomment this on the first run of docker compose up to initialize the DB
+    ## Then shut-down and comment it again to be able to run the web app
+    # command: ["pipenv","run","python","db.py","--init","http://db-server:3030/semweb","--type","SPARQLUpdateStore"]
   reverse-proxy:
     build: ./nginx
     ports:
