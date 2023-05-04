@@ -12,6 +12,9 @@ services:
       FLASK_DB_STORE_PATH: http://db-server:3030/semweb
     depends_on:
       - db-server
+    ## Uncomment this on the first run of docker compose up to initialize the DB
+    ## Then shut-down and comment it again to be able to run the web app
+    # command: ["pipenv","run","python","db.py","--init","http://db-server:3030/semweb","--type","SPARQLUpdateStore"]
   reverse-proxy:
     build: ./nginx
     ports:
@@ -23,9 +26,11 @@ services:
     depends_on:
       - semantic-app
   db-server:
-    build: ./jena-fuseki
+    image: ghcr.io/jhugon/apache-jena-fuseki-docker:main
     ports:
       - "3030:3030"
     volumes:
-      - ./jenadb/:/app/db
-    #command: ["./apache-jena-fuseki-4.5.0/fuseki-server","--help"]
+      - jenadb:/fuseki/databases
+    command: ["--update","--loc=/fuseki/databases","/semweb"]
+volumes:
+  jenadb:

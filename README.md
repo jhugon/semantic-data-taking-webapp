@@ -7,17 +7,22 @@ forms. The entered data can then be viewed in tables.
 ## Run locally with Docker
 
 1. Make directories:
-    ```bash
-    mkdir -p certs jenadb
-    ```
+   ```bash
+   mkdir -p certs jenadb
+   ```
 2. Generate a self-signed certificate:
-    ```bash
-    openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -sha256 -days 365 -nodes -subj '/CN=semweb.localhost'
-    ```
-3. Start the services:
-    ```bash
-    docker compose up --build
-    ```
+   ```bash
+   openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -sha256 -days 365 -nodes -subj '/CN=semweb.localhost'
+   ```
+3. Initialize the database by uncommenting the line starting with "command"
+   under "services -> semantic-app" in docker-compose.yml. Then run
+   `docker compose up`. After initialization is complete, semantic-app
+   should exit with code 0. Type Ctrl-C to shut down the docker services.
+   Finally, re-comment the line in docker-compose.yml.
+4. Start the services:
+   ```bash
+   docker compose up
+   ```
 
 The app should be visible at https://semweb.localhost:8080
 
