@@ -8,7 +8,7 @@ forms. The entered data can then be viewed in tables.
 
 1. Make directories:
    ```bash
-   mkdir -p certs jenadb
+   mkdir -p certs
    ```
 2. Generate a self-signed certificate:
    ```bash
