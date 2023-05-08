@@ -4,8 +4,6 @@ from pathlib import Path
 import logging
 import typer
 
-DATA_URI_BASE = ("http://data-webapp.hugonlabs.com/test1/",)
-
 
 class DBType(str, Enum):
     BerkelyDB = "BerkelyDB"
@@ -27,13 +25,12 @@ def init(dbpath: str, dbtype: DBType = DBType.SPARQLUpdateStore):
 def dump(
     dbpath: str,
     outfile: Path,
-    data_uri_base: Path = DATA_URI_BASE,
-    content_type: str = "text/turtle",
+    content_type: str = "application/trig",
 ):
     """
     Dumps the contents of the RDF database at DBPATH to OUTFILE.
     """
-    data = graph_store_get(dbpath, graph_uri=data_uri_base, content_type=content_type)
+    data = graph_store_get(dbpath, content_type=content_type)
     with outfile.open("w") as outf:
         outf.write(data)
 
@@ -42,7 +39,7 @@ def dump(
 def write(
     dbpath: str,
     infile: Path,
-    data_uri_base: Path = DATA_URI_BASE,
+    data_uri_base: Path = None,
     content_type: str = "text/turtle",
 ):
     """

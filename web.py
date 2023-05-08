@@ -358,7 +358,7 @@ def create_app():
     @login_required
     def download_rdf():
         rdf_data = db.getDataRDF()
-        return Response(rdf_data, mimetype="text/turtle")
+        return Response(rdf_data, mimetype="application/trig")
 
     return app
 

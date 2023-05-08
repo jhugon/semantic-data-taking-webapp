@@ -636,9 +636,9 @@ class DBInterface:
 
     def getDataRDF(self):
         """
-        Downloads whole data graph in Turtle format
+        Downloads whole database in Turtle format
         """
-        return graph_store_get(self.store_path, graph_uri=self.data_uri_base)
+        return graph_store_get(self.store_path)
 
     def getCategories(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
@@ -808,9 +808,7 @@ def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
     """
 
     params = {}
-    if graph_uri is None:
-        params["default"] = None
-    else:
+    if not (graph_uri is None):
         params["graph"] = graph_uri
     headers = {}
     headers["Content-Type"] = content_type
@@ -825,9 +823,7 @@ def graph_store_get(url, graph_uri=None, content_type="text/turtle"):
     """
 
     params = {}
-    if graph_uri is None:
-        params["default"] = None
-    else:
+    if not (graph_uri is None):
         params["graph"] = graph_uri
     headers = {}
     headers["Content-Type"] = content_type

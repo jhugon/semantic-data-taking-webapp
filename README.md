@@ -64,6 +64,32 @@ Access the site at https://semweb.localhost:5000
 The test site uses a dummy SSL certificate that updates on every server
 restart, so you will have to allow that in your browser after every update.
 
+## Backup the DB
+
+Click the "Download Data in RDF Turtle" on the main web page
+
+**OR**
+
+On the docker server, download this git repository and cd into the directory, and run
+
+```bash
+pipenv sync
+pipenv run python manage.py dump http://localhost:3030/semweb semweb_backup.trig
+```
+
+## Import a backup into the DB
+
+1. Setup a new docker DB server and don't initialize the DB
+
+2. Start the docker soerver with `docker compose -f docker-compose-prod.yml up` or similar
+
+2. Download this git repository and cd into the directory, then run
+   ```bash
+   pipenv sync
+   pipenv run python manage.py write --content_type="application/trig" http://localhost:3030/semweb semweb_backup.trig
+   ```
+   and replace "semweb_backup.trig" with your backup file
+
 ## Setting up for development:
 
 ```bash
