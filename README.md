@@ -81,12 +81,12 @@ pipenv run python manage.py dump http://localhost:3030/semweb semweb_backup.trig
 
 1. Setup a new docker DB server and don't initialize the DB
 
-2. Start the docker soerver with `docker compose -f docker-compose-prod.yml up` or similar
+2. Start the docker server with `docker compose -f docker-compose-prod.yml up` or similar
 
 2. Download this git repository and cd into the directory, then run
    ```bash
    pipenv sync
-   pipenv run python manage.py write --content_type="application/trig" http://localhost:3030/semweb semweb_backup.trig
+   pipenv run python manage.py write --content-type="application/trig" http://localhost:3030/semweb semweb_backup.trig
    ```
    and replace "semweb_backup.trig" with your backup file
 
