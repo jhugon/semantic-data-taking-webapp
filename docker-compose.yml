@@ -14,7 +14,7 @@ services:
       - db-server
     ## Uncomment this on the first run of docker compose up to initialize the DB
     ## Then shut-down and comment it again to be able to run the web app
-    # command: ["pipenv","run","python","db.py","--init","http://db-server:3030/semweb","--type","SPARQLUpdateStore"]
+    # command: ["pipenv","run","python","manage.py","init","http://db-server:3030/semweb"]
   reverse-proxy:
     build: ./nginx
     ports:

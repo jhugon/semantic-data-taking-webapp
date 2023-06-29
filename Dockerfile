@@ -31,6 +31,7 @@ COPY ontology ontology
 COPY templates templates
 COPY db.py .
 COPY web.py .
+COPY manage.py .
 
 EXPOSE 8000
 

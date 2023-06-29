@@ -636,9 +636,9 @@ class DBInterface:
 
     def getDataRDF(self):
         """
-        Downloads whole data graph in Turtle format
+        Downloads whole database in Turtle format
         """
-        return graph_store_get(self.store_path, graph_uri=self.data_uri_base)
+        return graph_store_get(self.store_path)
 
     def getCategories(self, observedProperty):
         observedProperty = self.convertToURIRef(observedProperty)
@@ -808,9 +808,7 @@ def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
     """
 
     params = {}
-    if graph_uri is None:
-        params["default"] = None
-    else:
+    if not (graph_uri is None):
         params["graph"] = graph_uri
     headers = {}
     headers["Content-Type"] = content_type
@@ -818,40 +816,22 @@ def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
     response.raise_for_status()
 
 
-def graph_store_get(url, graph_uri=None, content_type="text/turtle"):
+def graph_store_get(url, graph_uri=None, content_type="application/trig"):
     """
     url is the location of the server's graph store get endpoint
     graph_uri is the named graph to get, None for default
     """
 
     params = {}
-    if graph_uri is None:
-        params["default"] = None
-    else:
+    if not (graph_uri is None):
         params["graph"] = graph_uri
     headers = {}
     headers["Content-Type"] = content_type
     response = httpx.get(url, params=params, headers=headers)
     response.raise_for_status()
+    response_content_type = response.headers["Content-Type"]
+    if not (content_type is None) and content_type != response_content_type:
+        raise DBInterfaceError(
+            f"Response content type ({response_content_type}) doesn't match request content type ({content_type})"
+        )
     return response.text
-
-
-if __name__ == "__main__":
-    import argparse
-    import sys
-
-    logging.basicConfig(level=logging.INFO)
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--init", required=True, help="Directory name to initialize DB to"
-    )
-    parser.add_argument(
-        "--type",
-        default="BerkeleyDB",
-        choices=["BerkelyDB", "SPARQLUpdateStore"],
-        help="Type of database backend",
-    )
-    args = parser.parse_args()
-
-    DBInterface.initialize_store(args.init, args.type)
