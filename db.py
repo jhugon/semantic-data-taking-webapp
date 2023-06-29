@@ -816,7 +816,7 @@ def graph_store_post(url, rdftext, graph_uri=None, content_type="text/turtle"):
     response.raise_for_status()
 
 
-def graph_store_get(url, graph_uri=None, content_type="text/turtle"):
+def graph_store_get(url, graph_uri=None, content_type="application/trig"):
     """
     url is the location of the server's graph store get endpoint
     graph_uri is the named graph to get, None for default
@@ -829,4 +829,9 @@ def graph_store_get(url, graph_uri=None, content_type="text/turtle"):
     headers["Content-Type"] = content_type
     response = httpx.get(url, params=params, headers=headers)
     response.raise_for_status()
+    response_content_type = response.headers["Content-Type"]
+    if not (content_type is None) and content_type != response_content_type:
+        raise DBInterfaceError(
+            f"Response content type ({response_content_type}) doesn't match request content type ({content_type})"
+        )
     return response.text

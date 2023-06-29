@@ -66,7 +66,7 @@ restart, so you will have to allow that in your browser after every update.
 
 ## Backup the DB
 
-Click the "Download Data in RDF Turtle" on the main web page
+Click the "Download All Data in RDF TriG" button on the main web page.
 
 **OR**
 

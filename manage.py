@@ -43,7 +43,7 @@ def write(
     dbpath: str,
     infile: Path,
     data_uri_base: Path = None,
-    content_type: str = "text/turtle",
+    content_type: str = "application/trig",
 ):
     """
     Writes the contents of INFILE into the RDF database at DBPATH.
