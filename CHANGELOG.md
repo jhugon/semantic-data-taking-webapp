@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.10.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.10.0) - 2023-06-29
+
+- [`c0182ae`](https://github.com/jhugon/semantic-data-taking-webapp/commit/c0182ae4a62ba119ff166535e59ce118a92d1b86) Restore DB (#55)
+
 ## [v1.9.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.9.0) - 2023-05-04
 
 - [`1cf0bb1`](https://github.com/jhugon/semantic-data-taking-webapp/commit/1cf0bb148986da83e0ca009677d8fd30a2cece3a) Jena fuseki docker image (#53)
