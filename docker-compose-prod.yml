@@ -1,9 +1,8 @@
 version: "3.9"  # optional since v1.27.0
 services:
   semantic-app:
-    image: ghcr.io/jhugon/semantic-data-taking-webapp:main
+    image: ghcr.io/jhugon/semantic-data-taking-webapp:latest
     volumes:
-      - ./web-db-store.bdb:/app/web-db-store.bdb
       - ./userfile.txt:/app/userfile.txt
     environment:
       FLASK_DB_STORE_TYPE: SPARQLUpdateStore

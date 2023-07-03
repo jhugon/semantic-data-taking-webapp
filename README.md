@@ -109,6 +109,10 @@ and this before every commit:
 pipenv run pre-commit run --all
 ```
 
+## Making a Release
+
+This project uses SemVer, automatically via Uplift. On a tagged commit, a release may be made by clicking on the "releases" section of the GitHub repository page and then the "Draft a new release" button. Once a release is published, a Docker image will automatically be generated.
+
 ## Example Scenario
 
 A simple example of usage would be to collect data on the fuel economy of a
