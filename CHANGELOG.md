@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.11.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.1) - 2023-07-03
+
+- [`9a358c4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9a358c4e71bd9f7c1b886b3fd6e91caa1bbdf4d3) Publish docker image on release (#59)
+
 ## [v1.11.0](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.0) - 2023-07-01
 
 - [`4229420`](https://github.com/jhugon/semantic-data-taking-webapp/commit/4229420252ec9a389a3c0643f29f8464e343639f) feat: Update docker.yml
