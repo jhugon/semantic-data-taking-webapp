@@ -14,15 +14,24 @@ forms. The entered data can then be viewed in tables.
    ```bash
    openssl req -x509 -newkey rsa:4096 -keyout certs/key.pem -out certs/cert.pem -sha256 -days 365 -nodes -subj '/CN=semweb.localhost'
    ```
-3. Initialize the database by uncommenting the line starting with "command"
-   under "services -> semantic-app" in docker-compose.yml. Then run
-   `docker compose up`. After initialization is complete, semantic-app
-   should exit with code 0. Type Ctrl-C to shut down the docker services.
-   Finally, re-comment the line in docker-compose.yml.
 4. Start the services:
    ```bash
    docker compose up
    ```
+3. Initialize the database by running:
+   ```bash
+   docker compose run semantic-app pipenv run python manage.py init http://db-server:3030/semweb
+   ```
+5. Generate a userfile with
+   ```bash
+   pipenv sync
+   pipenv run flask-simple-login-gen-user-file-line > userfile.txt
+   ```
+   then copy it to the container with:
+   ```bash
+   docker cp userfile.txt <containerid>:/app/users/userfile.txt
+   ```
+   where you can find the containerid with `docker container ls`
 
 The app should be visible at https://semweb.localhost:8080
 

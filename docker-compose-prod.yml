@@ -2,16 +2,17 @@ version: "3.9"  # optional since v1.27.0
 services:
   semantic-app:
     image: ghcr.io/jhugon/semantic-data-taking-webapp:latest
+    ports:
+      - "8000:8000"
     volumes:
-      - ./userfile.txt:/app/userfile.txt
+      - users:/app/users
     environment:
       FLASK_DB_STORE_TYPE: SPARQLUpdateStore
       FLASK_DB_STORE_PATH: http://db-server:3030/semweb
+      FLASK_SERVER_NAME: semweb.localhost
+      FLASK_LOGIN_USER_FILE_PATH: /app/users/userfile.txt
     depends_on:
       - db-server
-    ## Uncomment this on the first run of docker compose up to initialize the DB
-    ## Then shut-down and comment it again to be able to run the web app
-    # command: ["pipenv","run","python","manage.py","init","http://db-server:3030/semweb"]
   reverse-proxy:
     build: ./nginx
     ports:
@@ -28,6 +29,9 @@ services:
       - "3030:3030"
     volumes:
       - jenadb:/fuseki/databases
+    #environment:
+    #  - "JAVA_OPTIONS=-Xmx512m -Xms512m"
     command: ["--update","--loc=/fuseki/databases","/semweb"]
 volumes:
   jenadb:
+  users:
