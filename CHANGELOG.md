@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.11.4](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.4) - 2023-07-05
+
+- [`dacf5e6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/dacf5e65965ff9479fbd3c376595cc98a5624e45) fix: only load quantity kinds english labels
+
 ## [v1.11.3](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.3) - 2023-07-05
 
 - [`8a4f7ab`](https://github.com/jhugon/semantic-data-taking-webapp/commit/8a4f7ab4104edcb3a66165af8908bac796253b04) fix: Made docker-compose files consistent
