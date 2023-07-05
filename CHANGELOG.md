@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.11.5](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.5) - 2023-07-05
+
+- [`d809efd`](https://github.com/jhugon/semantic-data-taking-webapp/commit/d809efd0cd34d8efc8a73d8339e37b0242180668) fix: Load and treat Currency different from other quantityKind
+
 ## [v1.11.4](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.4) - 2023-07-05
 
 - [`dacf5e6`](https://github.com/jhugon/semantic-data-taking-webapp/commit/dacf5e65965ff9479fbd3c376595cc98a5624e45) fix: only load quantity kinds english labels
