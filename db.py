@@ -15,6 +15,7 @@ LOGGER = logging.getLogger(__name__)
 # LOGGER.setLevel(logging.DEBUG)
 
 QUDT = Namespace("http://qudt.org/schema/qudt/")
+QUANTITYKIND = Namespace("http://qudt.org/vocab/quantitykind/")
 GEO = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
 
 
@@ -263,10 +264,12 @@ class DBInterface:
                 ):
                     raise DataValidationError(r"Quantity kind not found in database")
                 unit = self.convertToURIRef(unit)
-                if (
-                    len([quad for quad in self.triples((unit, RDF.type, QUDT.Unit))])
-                    < 1
-                ):
+                unitType = QUDT.Unit
+                if quantityKind == QUANTITYKIND.Currency:
+                    unitType = (
+                        QUDT.CurrencyUnit
+                    )  ## Because Currency has its own unit type
+                if len([quad for quad in self.triples((unit, RDF.type, unitType))]) < 1:
                     raise DataValidationError(r"Unit not found in database")
                 self.data_graph.add((prop, RDF.type, SOSA.ObservableProperty))
                 self.data_graph.set((prop, RDFS.label, label))
@@ -671,6 +674,7 @@ class DBInterface:
         prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         select ?qk ?qk_name
         from <http://qudt.org/vocab/quantitykind/>
+        from <http://qudt.org/vocab/currency/>
         from <http://qudt.org/vocab/unit/>
         from <http://schema.hugonlabs.com/sdtw#>
         from <http://ontology.hugonlabs.com/sdtw#>
@@ -769,6 +773,7 @@ class DBInterface:
                 "http://qudt.org/schema/qudt/",
                 "http://qudt.org/vocab/quantitykind/",
                 "http://qudt.org/vocab/unit/",
+                "http://qudt.org/vocab/currency/",
             ]:
                 LOGGER.info(f"Downloading triples from {url}")
                 response = httpx.get(url, follow_redirects=True)
