@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## Unreleased
 
+## [v1.11.2](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.2) - 2023-07-04
+
+- [`98861ae`](https://github.com/jhugon/semantic-data-taking-webapp/commit/98861aec287f84cae03a813f91d57b958e06dceb) fix: docker-compose-prod.yml works in prod
+
 ## [v1.11.1](https://github.com/jhugon/semantic-data-taking-webapp/releases/tag/v1.11.1) - 2023-07-03
 
 - [`9a358c4`](https://github.com/jhugon/semantic-data-taking-webapp/commit/9a358c4e71bd9f7c1b886b3fd6e91caa1bbdf4d3) Publish docker image on release (#59)
