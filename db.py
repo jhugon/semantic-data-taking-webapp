@@ -677,6 +677,7 @@ class DBInterface:
         where {
             ?qk rdf:type qudt:QuantityKind .
             ?qk rdfs:label ?qk_name .
+            FILTER (lang(?qk_name) = "" || langmatches(lang(?qk_name), "en"))
         }"""
 
         self.quantity_kinds = []

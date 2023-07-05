@@ -22,6 +22,10 @@ forms. The entered data can then be viewed in tables.
    ```bash
    docker compose run semantic-app pipenv run python manage.py init http://db-server:3030/semweb
    ```
+   and then restart the semantic-app:
+   ```bash
+   docker compose restart semantic-app
+   ```
 5. Generate a userfile with
    ```bash
    pipenv sync
