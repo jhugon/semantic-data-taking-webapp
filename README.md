@@ -31,7 +31,8 @@ forms. The entered data can then be viewed in tables.
    ```bash
    docker cp userfile.txt <containerid>:/app/users/userfile.txt
    ```
-   where you can find the containerid with `docker container ls`
+   where you can find the containerid with `docker container ls` as the line
+   with "semantic-data-taking-webapp-semantic-app".
 
 The app should be visible at https://semweb.localhost:8080
 

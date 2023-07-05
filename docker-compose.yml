@@ -5,16 +5,14 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./web-db-store.bdb:/app/web-db-store.bdb
-      - ./userfile.txt:/app/userfile.txt
+      - users:/app/users
     environment:
       FLASK_DB_STORE_TYPE: SPARQLUpdateStore
       FLASK_DB_STORE_PATH: http://db-server:3030/semweb
+      FLASK_SERVER_NAME: semweb.localhost
+      FLASK_LOGIN_USER_FILE_PATH: /app/users/userfile.txt
     depends_on:
       - db-server
-    ## Uncomment this on the first run of docker compose up to initialize the DB
-    ## Then shut-down and comment it again to be able to run the web app
-    # command: ["pipenv","run","python","manage.py","init","http://db-server:3030/semweb"]
   reverse-proxy:
     build: ./nginx
     ports:
@@ -31,6 +29,9 @@ services:
       - "3030:3030"
     volumes:
       - jenadb:/fuseki/databases
+    environment:
+      - "JAVA_OPTIONS=-Xmx512m -Xms512m" # This may be needed on a small-mem server
     command: ["--update","--loc=/fuseki/databases","/semweb"]
 volumes:
   jenadb:
+  users:
